@@ -1,3 +1,8 @@
+/**
+ * @fileOverview
+ * Topicmap jQuery plugin
+ * @version 1.0
+ */
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
@@ -7,7 +12,50 @@
         factory(autn.vis.util.wordWrap, jQuery, _);
     }
 }(function (wordWrap, $, _) {
-    var methods = {
+    var methods = /** @lends $.fn.topicmap.prototype */{
+        /**
+         * @memberof external:"jQuery.fn"
+         * @constructs
+         * @param {object} options
+         * @param {Number} [options.threshold=0.5]
+         *      The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
+         *      moved by all the vertexes in a step is less than this distance, we stop the animation.
+         * @param {Number} [options.minFont=6]
+         *      The smallest font size for node labels.
+         * @param {Number} [options.maxFont=50]
+         *      The largest font size usable on non-leaf node labels.
+         * @param {Number} [options.maxLeafFont=14]
+         *      The largest font size usable on leaf node labels.
+         * @param {Number} [options.minAreaSize=10]
+         *      Optional cutoff point for the minimum number of pixels a node must occupy. Any nodes smaller than this
+         *      will be discarded.
+         * @param {boolean} [options.enforceLabelBounds=false]
+         *      If set, any text labels which don't fit in their containing nodes will be removed.
+         * @param {boolean} [options.hideLegend=false]
+         *      If set, the positive-negative green-to-red sentiment legend will be hidden, even if clusterParam
+         *      parameter to renderData() was true.
+         * @param {boolean} [options.skipAnimation=false]
+         *      If set, animations will be skipped. There may be a noticeable pause if we skip animation,
+         *      since javascript is single threaded and it'll take a while to compute the final positions. The browser
+         *      may also give a warning if it takes too long.
+         * @param {onLeafClick} [options.onLeafClick]
+         *      Click handler when a node is left-clicked.
+         * @param {onLayoutCreation} [options.onLayoutCreation]
+         *      Optional callback which will be called after the treemap is configured, can be used to set treemap
+         *      layout options e.g. node sort order.
+         * @param {onNodeRender} [options.onNodeRender]
+         *      Optional callback which will be called after a node is rendered.
+         * @param {boolean} [options.showMarkers=false]
+         *      Debug flag. If set, markers will be drawn on the vertices during animation.
+         * @param {boolean} [options.singleStep=false]
+         *      Debug flag. If set, we only perform a single step of animation after rendering.
+         *      You can use this with the animate() method on the plugin to start/stop/step through animation.
+         * @param {onMarkerClick} [options.onMarkerClick]
+         *      Debug callback; will be called when a vertex is clicked. Note vertices are only visible+clickable when
+         *      the 'showMarkers' option is set true
+         *
+         * @returns {jQuery}
+         * */
         init: function(options) {
             return $(this).each(function() {
                 var dom = $(this), pluginMeta = dom.data('topicmap');
@@ -21,73 +69,36 @@
                 dom.data('topicmap', pluginMeta);
 
                 options = $.extend({
-                    /**
-                     * Optional: The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
-                     * moved by all the vertexes in a step is less than this distance, we stop the animation. Defaults to 0.5.
-                     */
                     threshold: 0.5,
-                    /**
-                     * Optional: The smallest font size for node labels. Defaults to 6.
-                     */
                     minFont: 6,
-                    /**
-                     * Optional: The largest font size usable on non-leaf node labels. Defaults to 50.
-                     */
                     maxFont: 50,
-                    /**
-                     * Optional: The largest font size usable on leaf node labels. Defaults to 14.
-                     */
                     maxLeafFont: 14,
-                    /**
-                     * Optional cutoff point for the minimum number of pixels a node must occupy. Anything smaller than this
-                     * will be discarded. Defaults to 10.
-                     */
                     minAreaSize: 10,
-                    /**
-                     * Optional flag to remove any text labels which don't fit in their containing nodes. Defaults to false.
-                     */
                     enforceLabelBounds: false,
-                    /**
-                     * Optional flag to hide the positive-negative green-to-red sentiment legend even when the clusterParam
-                     * parameter to renderData() was set to be true.
-                     */
                     hideLegend: false,
-                    /**
-                     * Optional flag to skip animation, defaults to false. There may be a noticeable pause if we skip animation,
-                     * since javascript is single threaded and it'll take a while to compute the final positions.
-                     */
                     skipAnimation: false,
+                    showMarkers: false,
+                    singleStep: false,
                     /**
-                     * Click handler when a node is left-clicked.
-                     * @param node the clicked node
-                     * @param names an array of node names, from the clicked node up to the root
-                     * @param clusterSentiment whether the clusterSentiment parameter was set when renderData() was called
-                     * @param evt
+                     * @callback onLeafClick
+                     * @param {object} node the clicked node
+                     * @param {String[]} names an array of node names, from the clicked node up to the root
+                     * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called
+                     * @param {Event} evt the click event
                      */
                     onLeafClick: undefined,
                     /**
-                     * Optional callback which will be called after the treemap is configured, can be used to set
-                     * additional treemap options
-                     * @param treemap the d3.layout.treemap which will be used for initial node layout
+                     * @callback onLayoutCreation
+                     * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout
                      */
                     onLayoutCreation: undefined,
                     /**
-                     * Optional callback which will be called after a node is rendered.
-                     * @param node the node which has just been rendered
+                     * @callback onNodeRender
+                     * @param {object} node the node which has just been rendered
                      */
                     onNodeRender: undefined,
                     /**
-                     * Debug flag: if enabled, markers will be drawn on the vertices during animation
-                     */
-                    showMarkers: false,
-                    /**
-                     * Debug flag: whether we should only perform a single step of animation. You can use this with the
-                     * animate() method on the plugin to start/stop/step through animation. Defaults to false.
-                     */
-                    singleStep: false,
-                    /**
-                     * Debug callback: will be called when a vertex is clicked. Vertices are only shown when the
-                     * 'debug' option is set true
+                     * @callback onMarkerClick
                      * @param vtx the clicked vertex
                      */
                     onMarkerClick: undefined,
@@ -131,6 +142,7 @@
          * @param json the tree data to render. Should have a root node, with children nodes. Each node should have a
          * 'name' label, a 'size' scaling factor and a optionally 'sentiment' information between 0 and 1, where 0 is
          * negative and 1 is positive.
+           @example
              {"name": "feeling", "size": 1.0, "children": [
                  {
                      "name": "bad feeling",
