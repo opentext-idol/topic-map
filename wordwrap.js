@@ -246,9 +246,7 @@
         }
     });
 
-    var fastRender = Raphael.vml || /[&?]fast=true/i.test(window.location.search);
-
-    return fastRender ? function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight, textEl) {
+    return Raphael.vml ? function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight, textEl) {
         var terms = text.split(' ');
 
         if (!layoutEl) {
