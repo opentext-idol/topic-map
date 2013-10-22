@@ -2,6 +2,8 @@
  * @fileOverview
  * Topicmap jQuery plugin
  * @version 1.0
+ *
+ * @external "jQuery.fn"
  */
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
@@ -12,9 +14,9 @@
         factory(autn.vis.util.wordWrap, jQuery, _);
     }
 }(function (wordWrap, $, _) {
-    var methods = /** @lends $.fn.topicmap.prototype */{
+    var methods = /** @lends external:"jQuery.fn".topicmap.prototype */{
         /**
-         * @memberof external:"jQuery.fn"
+         * @memberOf external:"jQuery.fn"
          * @constructs
          * @param {object} options
          * @param {Number} [options.threshold=0.5]
@@ -53,8 +55,14 @@
          * @param {onMarkerClick} [options.onMarkerClick]
          *      Debug callback; will be called when a vertex is clicked. Note vertices are only visible+clickable when
          *      the 'showMarkers' option is set true
-         *
-         * @returns {jQuery}
+         * @example
+         *      <pre><code>
+$('#paper').topicmap({
+    onLeafClick: function(node, names, clusterSentiment) {
+        alert('You clicked on node with hierarchy: ' + names.join(', '));
+    }
+});
+         *      </code></pre>
          * */
         init: function(options) {
             return $(this).each(function() {
@@ -112,6 +120,10 @@
         },
         /**
          * Clears the topicmap
+         * @example
+         *      <pre><code>
+$('#paper').topicmap({}).topicmap('clear');
+         *      </code></pre>
          */
         clear: function() {
             return $(this).each(function(){
@@ -126,7 +138,10 @@
          * @param path URL of the image to display
          * @param loaderW width of image
          * @param loaderH height of image
-         * @returns {*|jQuery}
+         * @example
+         *      <pre><code>
+$('#paper').topicmap({}).topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
+         *      </code></pre>
          */
         showLoader: function(path, loaderW, loaderH) {
             return $(this).each(function(){
@@ -142,61 +157,65 @@
          * @param json the tree data to render. Should have a root node, with children nodes. Each node should have a
          * 'name' label, a 'size' scaling factor and a optionally 'sentiment' information between 0 and 1, where 0 is
          * negative and 1 is positive.
-           @example
-             {"name": "feeling", "size": 1.0, "children": [
-                 {
-                     "name": "bad feeling",
-                     "size": 12.0,
-                     "children": [
-                         {
-                             "name": "must all his followers and campaigners",
-                             "size": 2.0,
-                             "children": null,
-                             "sentiment": 0.0
-                         },
-                         {
-                             "name": "He's made utter fools",
-                             "size": 2.0,
-                             "children": null,
-                             "sentiment": 0.0
-                         },
-                         {
-                             "name": "talk about feeling",
-                             "size": 2.0,
-                             "children": null,
-                             "sentiment": 0.25
-                         }
-                     ],
-                     "sentiment": 0.0625
-                 },
-                 {
-                     "name": "feeling better",
-                     "size": 5.0,
-                     "children": [],
-                     "sentiment": 0.9
-                 },
-                 {
-                     "name": "gut feeling",
-                     "size": 5.0,
-                     "children": [
-                         {
-                             "name": "$$ to a cause you trust",
-                             "size": 1.0,
-                             "children": null,
-                             "sentiment": 1.0
-                         },
-                         {
-                             "name": "US reciprocate with a possible attack",
-                             "size": 1.0,
-                             "children": null,
-                             "sentiment": 0.0
-                         }
-                     ],
-                     "sentiment": 0.5
-                 }
-             ], "sentiment": null}
          * @param clusterSentiment whether to use sentiment colouring and show the sentiment legend
-         * @returns {*|jQuery}
+         * @example
+         *   <pre><code>
+ $('#paper').topicmap({}).topicmap('renderData', {
+    "name": "feeling",
+    "size": 1.0,
+    "sentiment": null,
+    "children": [
+        {
+            "name": "bad feeling",
+            "size": 12.0,
+            "sentiment": 0.0625,
+            "children": [
+                {
+                    "name": "must all his followers and campaigners",
+                    "size": 2.0,
+                    "children": null,
+                    "sentiment": 0.0
+                },
+                {
+                    "name": "He's made utter fools",
+                    "size": 2.0,
+                    "children": null,
+                    "sentiment": 0.0
+                },
+                {
+                    "name": "talk about feeling",
+                    "size": 2.0,
+                    "children": null,
+                    "sentiment": 0.25
+                }
+            ]
+        }, {
+            "name": "feeling better",
+            "size": 5.0,
+            "children": [],
+            "sentiment": 0.9
+        }, {
+            "name": "gut feeling",
+            "size": 5.0,
+            "sentiment": 0.5,
+            "children": [
+                {
+                    "name": "$$ to a cause you trust",
+                    "size": 1.0,
+                    "children": null,
+                    "sentiment": 1.0
+                },
+                {
+                    "name": "US reciprocate with a possible attack",
+                    "size": 1.0,
+                    "children": null,
+                    "sentiment": 0.0
+                }
+            ]
+        }
+    ]
+}, true);
+         *   </code></pre>
          */
         renderData: function(json, clusterSentiment) {
             return $(this).each(function(){
@@ -210,6 +229,11 @@
          * Allows starting/stopping the animation
          * @param animate false to stop animation, true to resume animation
          * @param singleStep whether to just render a single animation step
+         *
+         * @example
+         *      <pre><code>
+$('#paper').topicmap({}).topicmap('animate', false, false);
+         *      </code></pre>
          */
         animate: function(animate, singleStep) {
             return $(this).each(function(){
