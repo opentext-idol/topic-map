@@ -2,8 +2,6 @@
  * @fileOverview
  * Topicmap jQuery plugin
  * @version 1.0
- *
- *
  */
 /**
  * @external jQuery
@@ -24,11 +22,13 @@
     var methods = /** @lends external:jQuery.external:fn.topicmap.prototype */{
         /**
          * @constructs
-         * @name external:jQuery.external:fn.topicmap
+         * @description Namespace and static initializer for the topicmap. Note that it's written as a jQuery plugin,
+         * so it's initialized by calling e.g. <code> $('#paper').topicmap({}); </code> to create an instance and the
+         * methods are called using e.g. <code> $('#paper').topicmap('clear'); </code>
          * @param {object} options
          * @param {Number} [options.threshold=0.5]
          *      The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
-         *      moved by all the vertexes in a step is less than this distance, we stop the animation.
+         *      moved by all the vertices in a step is less than this distance, we stop the animation.
          * @param {Number} [options.minFont=6]
          *      The smallest font size for node labels.
          * @param {Number} [options.maxFont=50]
@@ -54,21 +54,17 @@
          *      layout options e.g. node sort order.
          * @param {external:jQuery.external:fn.topicmap~onNodeRender} [options.onNodeRender]
          *      Optional callback which will be called after a node is rendered.
-         * @param {boolean} [options.showMarkers=false]
+         * @param {boolean} [options.showVertices=false]
          *      Debug flag. If set, markers will be drawn on the vertices during animation.
          * @param {boolean} [options.singleStep=false]
          *      Debug flag. If set, we only perform a single step of animation after rendering.
          *      You can use this with the animate() method on the plugin to start/stop/step through animation.
-         * @param {external:jQuery.external:fn.topicmap~onMarkerClick} [options.onMarkerClick]
-         *      Debug callback; will be called when a vertex is clicked. Note vertices are only visible+clickable when
-         *      the 'showMarkers' option is set true
+         * @param {external:jQuery.external:fn.topicmap~onVertexHover} [options.onVertexHover]
+         *      Debug callback; will be called when the mouse hovers over a vertex.
+         *      Note: vertices are only visible+hoverable when the 'showVertices' option is set true.
          * @example
          *      <code>
-$('#paper').topicmap({
-    onLeafClick: function(node, names, clusterSentiment) {
-        alert('You clicked on node with hierarchy: ' + names.join(', '));
-    }
-});
+$('#paper').topicmap({});
          *      </code>
          * */
         init: function(options) {
@@ -92,7 +88,7 @@ $('#paper').topicmap({
                     enforceLabelBounds: false,
                     hideLegend: false,
                     skipAnimation: false,
-                    showMarkers: false,
+                    showVertices: false,
                     singleStep: false,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLeafClick
@@ -100,23 +96,55 @@ $('#paper').topicmap({
                      * @param {String[]} names an array of node names, from the clicked node up to the root
                      * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called
                      * @param {Event} evt the click event
+                     * @example
+                     * <code>
+$('#paper').topicmap({
+    onLeafClick: function(node, names, clusterSentiment) {
+        alert('You clicked on node with hierarchy: ' + names.join(', '));
+    }
+});
+                     * </code>
                      */
                     onLeafClick: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout
+                     * @example
+                     * <code>
+$('#paper').topicmap({
+    onLayoutCreation: function(layout) {
+        layout.sort(function (a, b) { return a.size - b.size; })
+    }
+});
+                     * </code>
                      */
                     onLayoutCreation: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onNodeRender
                      * @param {object} node the node which has just been rendered
+                     * @example
+                     * <code>
+$('#paper').topicmap({
+    onNodeRender: function(node) {
+        console.log('rendered node', node);
+    }
+});
+                     * </code>
                      */
                     onNodeRender: undefined,
                     /**
-                     * @callback external:jQuery.external:fn.topicmap~onMarkerClick
-                     * @param {object} vtx the clicked vertex
+                     * @callback external:jQuery.external:fn.topicmap~onVertexHover
+                     * @param {object} vtx the hovered vertex
+                     * @example
+                     * <code>
+$('#paper').topicmap({
+    onVertexHover: function(node) {
+        console.log('hovered node', node);
+    }
+});
+                     * </code>
                      */
-                    onMarkerClick: undefined,
+                    onVertexHover: undefined,
                     i18n: $.extend({
                         'autn.vis.topicmap.noResultsAvailable': 'No results available, please try a different query'
                     }, options && options.i18n)
@@ -265,7 +293,7 @@ $('#paper').topicmap('animate', false, false);
     function setupPlugin(dom, options, pluginMeta) {
         var hideLegend = options.hideLegend;
 
-        var showMarkers = options.showMarkers;
+        var showVertices = options.showVertices;
         var skipAnimation = options.skipAnimation;
         var baseOpacity = skipAnimation ? 1 : 0.1;
 
@@ -276,7 +304,7 @@ $('#paper').topicmap('animate', false, false);
         var paper = Raphael(dom[0], width, height), mesh;
 
         var onLeafClick = options.onLeafClick;
-        var onMarkerClick = options.onMarkerClick;
+        var onVertexHover = options.onVertexHover;
         var onLayoutCreation = options.onLayoutCreation;
 
         var isDragging = false;
@@ -906,7 +934,7 @@ $('#paper').topicmap('animate', false, false);
                     }
                 }
 
-                if (showMarkers) {
+                if (showVertices) {
                     for (depth = maxDepth; depth >= 0; --depth) {
                         depthPolyMeta[depth].vertices.forEach(function(vtx){
                             if (vtx.marker) {
@@ -922,7 +950,7 @@ $('#paper').topicmap('animate', false, false);
 
                             vtx.marker.hover(function(){
                                 vtx.vtxContraints && vtx.vtxContraints.forEach(function(a){a.marker.attr({fill: 'orange'});});
-                                onMarkerClick && onMarkerClick(vtx); 
+                                onVertexHover && onVertexHover(vtx);
                             }, function(){
                                 vtx.vtxContraints && vtx.vtxContraints.forEach(function(a){a.marker.attr({fill: a.vtxContraints ? 'blue' : 'red'});});
                             });
@@ -983,7 +1011,7 @@ $('#paper').topicmap('animate', false, false);
                     this.vtxContraints = [vtx1, vtx2];
                 };
 
-                // finds projection of this point along the two vertexes and clips to the polygon edges
+                // finds projection of this point along the two vertices and clips to the polygon edges
                 this.applyConstraints = function() {
                     var a = this.vtxContraints[0];
                     var b = this.vtxContraints[1];
