@@ -1,7 +1,6 @@
 /**
  * @fileOverview
  * Topicmap jQuery plugin
- * @version 1.0
  */
 /**
  * @external jQuery
