@@ -3,7 +3,14 @@
  * Topicmap jQuery plugin
  * @version 1.0
  *
- * @external "jQuery.fn"
+ *
+ */
+/**
+ * @external jQuery
+ */
+/**
+ * @external fn
+ * @memberOf external:jQuery
  */
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
@@ -14,10 +21,10 @@
         factory(autn.vis.util.wordWrap, jQuery, _);
     }
 }(function (wordWrap, $, _) {
-    var methods = /** @lends external:"jQuery.fn".topicmap.prototype */{
+    var methods = /** @lends external:jQuery.external:fn.topicmap.prototype */{
         /**
-         * @memberOf external:"jQuery.fn"
          * @constructs
+         * @name external:jQuery.external:fn.topicmap
          * @param {object} options
          * @param {Number} [options.threshold=0.5]
          *      The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
@@ -40,19 +47,19 @@
          *      If set, animations will be skipped. There may be a noticeable pause if we skip animation,
          *      since javascript is single threaded and it'll take a while to compute the final positions. The browser
          *      may also give a warning if it takes too long.
-         * @param {onLeafClick} [options.onLeafClick]
+         * @param {external:jQuery.external:fn.topicmap~onLeafClick} [options.onLeafClick]
          *      Click handler when a node is left-clicked.
-         * @param {onLayoutCreation} [options.onLayoutCreation]
+         * @param {external:jQuery.external:fn.topicmap~onLayoutCreation} [options.onLayoutCreation]
          *      Optional callback which will be called after the treemap is configured, can be used to set treemap
          *      layout options e.g. node sort order.
-         * @param {onNodeRender} [options.onNodeRender]
+         * @param {external:jQuery.external:fn.topicmap~onNodeRender} [options.onNodeRender]
          *      Optional callback which will be called after a node is rendered.
          * @param {boolean} [options.showMarkers=false]
          *      Debug flag. If set, markers will be drawn on the vertices during animation.
          * @param {boolean} [options.singleStep=false]
          *      Debug flag. If set, we only perform a single step of animation after rendering.
          *      You can use this with the animate() method on the plugin to start/stop/step through animation.
-         * @param {onMarkerClick} [options.onMarkerClick]
+         * @param {external:jQuery.external:fn.topicmap~onMarkerClick} [options.onMarkerClick]
          *      Debug callback; will be called when a vertex is clicked. Note vertices are only visible+clickable when
          *      the 'showMarkers' option is set true
          * @example
@@ -88,7 +95,7 @@ $('#paper').topicmap({
                     showMarkers: false,
                     singleStep: false,
                     /**
-                     * @callback onLeafClick
+                     * @callback external:jQuery.external:fn.topicmap~onLeafClick
                      * @param {object} node the clicked node
                      * @param {String[]} names an array of node names, from the clicked node up to the root
                      * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called
@@ -96,17 +103,17 @@ $('#paper').topicmap({
                      */
                     onLeafClick: undefined,
                     /**
-                     * @callback onLayoutCreation
+                     * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout
                      */
                     onLayoutCreation: undefined,
                     /**
-                     * @callback onNodeRender
+                     * @callback external:jQuery.external:fn.topicmap~onNodeRender
                      * @param {object} node the node which has just been rendered
                      */
                     onNodeRender: undefined,
                     /**
-                     * @callback onMarkerClick
+                     * @callback external:jQuery.external:fn.topicmap~onMarkerClick
                      * @param vtx the clicked vertex
                      */
                     onMarkerClick: undefined,
