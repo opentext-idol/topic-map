@@ -35,8 +35,8 @@
         /**
          * @constructs
          * @description Namespace and static initializer for the topicmap. Note that it's written as a jQuery plugin,
-         * so it's initialized by calling e.g. <code> $('#paper').topicmap({}) </code> to create an instance and the
-         * methods are called using e.g. <code> $('#paper').topicmap('clear') </code>
+         * so it's initialized by calling e.g. <pre><code> $('#paper').topicmap({}) </code></pre> to create an instance and the
+         * methods are called using e.g. <pre><code> $('#paper').topicmap('clear') </code></pre>
          * @param {object} options
          * @param {number} [options.threshold=0.5]
          *      The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
@@ -77,9 +77,9 @@
          * @param {object} [options.i18n]
          * @param {string} [options.i18n.autn.vis.topicmap.noResultsAvailable='No results available, please try a different query'] string shown when no results are available.
          * @example
-         *      <code>
+         *      <pre><code>
 $('#paper').topicmap({});
-         *      </code>
+         *      </code></pre>
          * */
         init: function(options) {
             return $(this).each(function() {
@@ -111,52 +111,52 @@ $('#paper').topicmap({});
                      * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called.
                      * @param {Event} evt the click event.
                      * @example
-                     * <code>
+                     * <pre><code>
 $('#paper').topicmap({
     onLeafClick: function(node, names, clusterSentiment) {
         alert('You clicked on node with hierarchy: ' + names.join(', '));
     }
 });
-                     * </code>
+                     * </code></pre>
                      */
                     onLeafClick: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout.
                      * @example
-                     * <code>
+                     * <pre><code>
 $('#paper').topicmap({
     onLayoutCreation: function(layout) {
         layout.sort(function (a, b) { return a.size - b.size; })
     }
 });
-                     * </code>
+                     * </code></pre>
                      */
                     onLayoutCreation: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onNodeRender
                      * @param {external:jQuery.external:fn.topicmap~Node} node the node which has just been rendered.
                      * @example
-                     * <code>
+                     * <pre><code>
 $('#paper').topicmap({
     onNodeRender: function(node) {
         console.log('rendered node', node);
     }
 });
-                     * </code>
+                     * </code></pre>
                      */
                     onNodeRender: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onVertexHover
                      * @param {object} vtx the hovered vertex.
                      * @example
-                     * <code>
+                     * <pre><code>
 $('#paper').topicmap({
     onVertexHover: function(node) {
         console.log('hovered node', node);
     }
 });
-                     * </code>
+                     * </code></pre>
                      */
                     onVertexHover: undefined,
                     i18n: $.extend({
@@ -170,9 +170,9 @@ $('#paper').topicmap({
         /**
          * Clears the topicmap.
          * @example
-         *      <code>
+         *      <pre><code>
 $('#paper').topicmap('clear');
-         *      </code>
+         *      </code></pre>
          */
         clear: function() {
             return $(this).each(function(){
@@ -188,9 +188,9 @@ $('#paper').topicmap('clear');
          * @param {number} loaderW width of image.
          * @param {number} loaderH height of image.
          * @example
-         *      <code>
+         *      <pre><code>
 $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
-         *      </code>
+         *      </code></pre>
          */
         showLoader: function(path, loaderW, loaderH) {
             return $(this).each(function(){
@@ -210,7 +210,7 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
          * @param {boolean} clusterSentiment
          *      If true, nodes will be coloured based on their sentiment values and the sentiment legend will be shown.
          * @example
-         *   <code>
+         *   <pre><code>
  $('#paper').topicmap('renderData', {
     "name": "feeling",
     "size": 1.0,
@@ -266,7 +266,7 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
         }
     ]
 }, true);
-         *   </code>
+         *   </code></pre>
          */
         renderData: function(json, clusterSentiment) {
             return $(this).each(function(){
@@ -282,9 +282,9 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
          * @param {boolean} singleStep whether to just render a single animation step.
          *
          * @example
-         *      <code>
+         *      <pre><code>
 $('#paper').topicmap('animate', false, false);
-         *      </code>
+         *      </code></pre>
          */
         animate: function(animate, singleStep) {
             return $(this).each(function(){
