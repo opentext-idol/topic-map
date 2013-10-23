@@ -19,29 +19,41 @@
         factory(autn.vis.util.wordWrap, jQuery, _);
     }
 }(function (wordWrap, $, _) {
+    /**
+     *  @typedef external:jQuery.external:fn.topicmap~Node
+     *  @type {Object}
+     *  @property {string} name
+     *      The label for the node.
+     *  @property {number} size
+     *      The node size. Sizes will be normalized, so if you need to keep the original values for use in callbacks
+     *      you should copy it to another property before rendering the data.
+     *  @property {number} [sentiment]
+     *      Sentiment between 0 (negative) and 1 (positive).
+     */
+
     var methods = /** @lends external:jQuery.external:fn.topicmap.prototype */{
         /**
          * @constructs
          * @description Namespace and static initializer for the topicmap. Note that it's written as a jQuery plugin,
-         * so it's initialized by calling e.g. <code> $('#paper').topicmap({}); </code> to create an instance and the
-         * methods are called using e.g. <code> $('#paper').topicmap('clear'); </code>
+         * so it's initialized by calling e.g. <code> $('#paper').topicmap({}) </code> to create an instance and the
+         * methods are called using e.g. <code> $('#paper').topicmap('clear') </code>
          * @param {object} options
-         * @param {Number} [options.threshold=0.5]
+         * @param {number} [options.threshold=0.5]
          *      The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
          *      moved by all the vertices in a step is less than this distance, we stop the animation.
-         * @param {Number} [options.minFont=6]
+         * @param {number} [options.minFont=6]
          *      The smallest font size for node labels.
-         * @param {Number} [options.maxFont=50]
+         * @param {number} [options.maxFont=50]
          *      The largest font size usable on non-leaf node labels.
-         * @param {Number} [options.maxLeafFont=14]
+         * @param {number} [options.maxLeafFont=14]
          *      The largest font size usable on leaf node labels.
-         * @param {Number} [options.minAreaSize=10]
+         * @param {number} [options.minAreaSize=10]
          *      Optional cutoff point for the minimum number of pixels a node must occupy. Any nodes smaller than this
          *      will be discarded.
          * @param {boolean} [options.enforceLabelBounds=false]
          *      If set, any text labels which don't fit in their containing nodes will be removed.
          * @param {boolean} [options.hideLegend=false]
-         *      If set, the positive-negative green-to-red sentiment legend will be hidden, even if clusterParam
+         *      If set, the positive-negative green-to-red sentiment legend will be hidden, even if the clusterParam
          *      parameter to renderData() was true.
          * @param {boolean} [options.skipAnimation=false]
          *      If set, animations will be skipped. There may be a noticeable pause if we skip animation,
@@ -58,7 +70,7 @@
          *      Debug flag. If set, markers will be drawn on the vertices during animation.
          * @param {boolean} [options.singleStep=false]
          *      Debug flag. If set, we only perform a single step of animation after rendering.
-         *      You can use this with the animate() method on the plugin to start/stop/step through animation.
+         *      You can use this with the animate() method on the plugin to start/stop/step-through animation.
          * @param {external:jQuery.external:fn.topicmap~onVertexHover} [options.onVertexHover]
          *      Debug callback; will be called when the mouse hovers over a vertex.
          *      Note: vertices are only visible+hoverable when the 'showVertices' option is set true.
@@ -92,10 +104,10 @@ $('#paper').topicmap({});
                     singleStep: false,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLeafClick
-                     * @param {object} node the clicked node
-                     * @param {String[]} names an array of node names, from the clicked node up to the root
-                     * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called
-                     * @param {Event} evt the click event
+                     * @param {external:jQuery.external:fn.topicmap~Node} node the clicked node.
+                     * @param {string[]} names an array of node names, from the clicked node up to the root.
+                     * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called.
+                     * @param {Event} evt the click event.
                      * @example
                      * <code>
 $('#paper').topicmap({
@@ -108,7 +120,7 @@ $('#paper').topicmap({
                     onLeafClick: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
-                     * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout
+                     * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout.
                      * @example
                      * <code>
 $('#paper').topicmap({
@@ -121,7 +133,7 @@ $('#paper').topicmap({
                     onLayoutCreation: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onNodeRender
-                     * @param {object} node the node which has just been rendered
+                     * @param {external:jQuery.external:fn.topicmap~Node} node the node which has just been rendered.
                      * @example
                      * <code>
 $('#paper').topicmap({
@@ -134,7 +146,7 @@ $('#paper').topicmap({
                     onNodeRender: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onVertexHover
-                     * @param {object} vtx the hovered vertex
+                     * @param {object} vtx the hovered vertex.
                      * @example
                      * <code>
 $('#paper').topicmap({
@@ -154,7 +166,7 @@ $('#paper').topicmap({
             });
         },
         /**
-         * Clears the topicmap
+         * Clears the topicmap.
          * @example
          *      <code>
 $('#paper').topicmap('clear');
@@ -169,10 +181,10 @@ $('#paper').topicmap('clear');
             });
         },
         /**
-         * Show a loading spinner on the topicmap
-         * @param {String} path URL of the image to display
-         * @param {Number} loaderW width of image
-         * @param {Number} loaderH height of image
+         * Show a loading spinner on the topicmap.
+         * @param {string} path URL of the image to display.
+         * @param {number} loaderW width of image.
+         * @param {number} loaderH height of image.
          * @example
          *      <code>
 $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
@@ -188,11 +200,13 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
             });
         },
         /**
-         * Render some tree data on the topic map
-         * @param {Object} json the tree data to render. Should have a root node, with children nodes. Each node should have a
-         * 'name' label, a 'size' scaling factor and a optionally 'sentiment' information between 0 and 1, where 0 is
-         * negative and 1 is positive.
-         * @param {boolean} clusterSentiment whether to use sentiment colouring and show the sentiment legend
+         * Render tree data on the topic map.
+         * @param {external:jQuery.external:fn.topicmap~Node} json
+         *     The tree data to render. Should have a root node, with children nodes. Each node should have a
+         *      'name' label, a 'size' scaling factor and optionally 'sentiment' information between 0 and 1, where 0 is
+         *      negative and 1 is positive.
+         * @param {boolean} clusterSentiment
+         *      If true, nodes will be coloured based on their sentiment values and the sentiment legend will be shown.
          * @example
          *   <code>
  $('#paper').topicmap('renderData', {
@@ -261,9 +275,9 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
             });
         },
         /**
-         * Allows starting/stopping the animation
-         * @param {boolean} animate false to stop animation, true to resume animation
-         * @param {boolean} singleStep whether to just render a single animation step
+         * Allows starting/stopping the animation.
+         * @param {boolean} animate false to stop animation, true to resume animation.
+         * @param {boolean} singleStep whether to just render a single animation step.
          *
          * @example
          *      <code>
