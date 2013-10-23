@@ -21,7 +21,7 @@
 }(function (wordWrap, $, _) {
     /**
      *  @typedef external:jQuery.external:fn.topicmap~Node
-     *  @type {Object}
+     *  @type {object}
      *  @property {string} name
      *      The label for the node.
      *  @property {number} size
@@ -74,6 +74,8 @@
          * @param {external:jQuery.external:fn.topicmap~onVertexHover} [options.onVertexHover]
          *      Debug callback; will be called when the mouse hovers over a vertex.
          *      Note: vertices are only visible+hoverable when the 'showVertices' option is set true.
+         * @param {object} [options.i18n]
+         * @param {string} [options.i18n."autn.vis.topicmap.noResultsAvailable"=No results available, please try a different query] string shown when no results are available.
          * @example
          *      <code>
 $('#paper').topicmap({});
