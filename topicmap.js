@@ -1,6 +1,9 @@
 /**
  * @fileOverview
  * Topicmap jQuery plugin
+ *
+ * @see topicmap-sample.html/topicmap-require-sample.js in the sample project as a minimal example.
+ * @see topicmap.html/topicmap-require.html in the sample project as an example of integration with a working backend.
  */
 /**
  * @external jQuery
@@ -36,6 +39,8 @@
          * @description Namespace and static initializer for the topicmap. Note that it's written as a jQuery plugin,
          * so it's initialized by calling e.g. <pre><code> $('#paper').topicmap({}) </code></pre> to create an instance and the
          * methods are called using e.g. <pre><code> $('#paper').topicmap('clear') </code></pre>
+         * See topicmap-sample.html/topicmap-require-sample.js in the sample project as a minimal example, or
+         * topicmap.html/topicmap-require.html as an example of integration with a working backend.
          * @param {object} options
          * @param {number} [options.threshold=0.5]
          *      The distance cutoff used to decide if we can stop iterating and/or animating. If the distance
