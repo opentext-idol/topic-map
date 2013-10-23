@@ -63,13 +63,13 @@
          *      Debug callback; will be called when a vertex is clicked. Note vertices are only visible+clickable when
          *      the 'showMarkers' option is set true
          * @example
-         *      <pre><code>
+         *      <code>
 $('#paper').topicmap({
     onLeafClick: function(node, names, clusterSentiment) {
         alert('You clicked on node with hierarchy: ' + names.join(', '));
     }
 });
-         *      </code></pre>
+         *      </code>
          * */
         init: function(options) {
             return $(this).each(function() {
@@ -114,7 +114,7 @@ $('#paper').topicmap({
                     onNodeRender: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onMarkerClick
-                     * @param vtx the clicked vertex
+                     * @param {object} vtx the clicked vertex
                      */
                     onMarkerClick: undefined,
                     i18n: $.extend({
@@ -128,9 +128,9 @@ $('#paper').topicmap({
         /**
          * Clears the topicmap
          * @example
-         *      <pre><code>
-$('#paper').topicmap({}).topicmap('clear');
-         *      </code></pre>
+         *      <code>
+$('#paper').topicmap('clear');
+         *      </code>
          */
         clear: function() {
             return $(this).each(function(){
@@ -142,13 +142,13 @@ $('#paper').topicmap({}).topicmap('clear');
         },
         /**
          * Show a loading spinner on the topicmap
-         * @param path URL of the image to display
-         * @param loaderW width of image
-         * @param loaderH height of image
+         * @param {String} path URL of the image to display
+         * @param {Number} loaderW width of image
+         * @param {Number} loaderH height of image
          * @example
-         *      <pre><code>
-$('#paper').topicmap({}).topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
-         *      </code></pre>
+         *      <code>
+$('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
+         *      </code>
          */
         showLoader: function(path, loaderW, loaderH) {
             return $(this).each(function(){
@@ -161,13 +161,13 @@ $('#paper').topicmap({}).topicmap('showLoader', 'lib/autn/vis/util/img/ajax-load
         },
         /**
          * Render some tree data on the topic map
-         * @param json the tree data to render. Should have a root node, with children nodes. Each node should have a
+         * @param {Object} json the tree data to render. Should have a root node, with children nodes. Each node should have a
          * 'name' label, a 'size' scaling factor and a optionally 'sentiment' information between 0 and 1, where 0 is
          * negative and 1 is positive.
-         * @param clusterSentiment whether to use sentiment colouring and show the sentiment legend
+         * @param {boolean} clusterSentiment whether to use sentiment colouring and show the sentiment legend
          * @example
-         *   <pre><code>
- $('#paper').topicmap({}).topicmap('renderData', {
+         *   <code>
+ $('#paper').topicmap('renderData', {
     "name": "feeling",
     "size": 1.0,
     "sentiment": null,
@@ -222,7 +222,7 @@ $('#paper').topicmap({}).topicmap('showLoader', 'lib/autn/vis/util/img/ajax-load
         }
     ]
 }, true);
-         *   </code></pre>
+         *   </code>
          */
         renderData: function(json, clusterSentiment) {
             return $(this).each(function(){
@@ -234,13 +234,13 @@ $('#paper').topicmap({}).topicmap('showLoader', 'lib/autn/vis/util/img/ajax-load
         },
         /**
          * Allows starting/stopping the animation
-         * @param animate false to stop animation, true to resume animation
-         * @param singleStep whether to just render a single animation step
+         * @param {boolean} animate false to stop animation, true to resume animation
+         * @param {boolean} singleStep whether to just render a single animation step
          *
          * @example
-         *      <pre><code>
-$('#paper').topicmap({}).topicmap('animate', false, false);
-         *      </code></pre>
+         *      <code>
+$('#paper').topicmap('animate', false, false);
+         *      </code>
          */
         animate: function(animate, singleStep) {
             return $(this).each(function(){
