@@ -162,11 +162,12 @@ $('#paper').topicmap({
 });
                      * </code></pre>
                      */
-                    onVertexHover: undefined,
+                    onVertexHover: undefined
+                }, options, {
                     i18n: $.extend({
                         'autn.vis.topicmap.noResultsAvailable': 'No results available, please try a different query'
                     }, options && options.i18n)
-                }, options);
+                });
 
                 setupPlugin(dom, options, pluginMeta);
             });
