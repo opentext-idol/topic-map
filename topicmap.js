@@ -5,13 +5,6 @@
  * @see topicmap-sample.html/topicmap-require-sample.js in the sample project as a minimal example.
  * @see topicmap.html/topicmap-require.html in the sample project as an example of integration with a working backend.
  */
-/**
- * @external jQuery
- */
-/**
- * @external fn
- * @memberOf external:jQuery
- */
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
