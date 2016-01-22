@@ -9,7 +9,7 @@ module.exports = (grunt) ->
     ]
     jsdoc:
       dist:
-        src: ['topicmap.js', 'README.md']
+        src: ['src/js/topicmap.js', 'README.md']
         options:
           destination: documentation
           template: 'node_modules/ink-docstrap/template'
