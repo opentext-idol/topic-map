@@ -8,7 +8,7 @@
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
-        define(['autn/vis/util/wordwrap', 'jquery', 'underscore', 'd3', 'raphael'], factory);
+        define(['topicmap/js/wordwrap', 'jquery', 'underscore', 'd3', 'raphael'], factory);
     } else {
         // We're using plain javascript imports, create jQuery plugin using imports from the Autn namespace.
         factory(autn.vis.util.wordWrap, jQuery, _);
