@@ -1,10 +1,10 @@
 # HP Autonomy Topic Map
 
-[![Build Status](https://travis-ci.org/hpautonomy/topic-map.svg?branch=master)](https://travis-ci.org/hpautonomy/topic-map)
+[![Build Status](https://travis-ci.org/hpe-idol/topic-map.svg?branch=master)](https://travis-ci.org/hpe-idol/topic-map)
 
 A JQuery plugin for displaying information in a topic map.
 
-Documentation can be found [here](http://hpautonomy.github.io/topic-map).
+Documentation can be found [here](http://hpe-idol.github.io/topic-map).
 
 This repo uses git-flow. develop is the development branch. master is the last known good branch.
 
@@ -23,6 +23,6 @@ This repo uses git-flow. develop is the development branch. master is the last k
 Yes
 
 ## License
-Copyright 2016 Hewlett-Packard Development Company, L.P.
+Copyright 2016 Hewlett Packard Enterprise Development LP
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
