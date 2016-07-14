@@ -815,7 +815,20 @@ $('#paper').topicmap('animate', false, false);
                                 opacity: depth <=2 ? baseOpacity : 1
                             });
 
-                            $(textEl.node).css('pointer-events', 'none');
+                            if (options.onNodeTitleClick ) {
+                                textEl.hover(function () {
+                                    textEl.scale(1.05);
+                                }, function () {
+                                    textEl.scale(1 / 1.05);
+                                });
+                            }
+
+                            var names = [];
+                            for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
+
+                            textEl.click(function() {
+                                options.onNodeTitleClick  && options.onNodeTitleClick (node, names);
+                            });
 
                             var poly = d3.geom.polygon(node.poly);
                             var horz = poly.clip([[0, centroidY], [width, centroidY]]);
@@ -901,8 +914,7 @@ $('#paper').topicmap('animate', false, false);
                                     node.animating = true;
                                     return;
                                 }
-                                var names = [];
-                                for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
+
                                 onLeafClick && onLeafClick(node, names, clusterSentiment, evt);
                             });
 
