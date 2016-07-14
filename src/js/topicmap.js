@@ -117,6 +117,21 @@ $('#paper').topicmap({
                      * </code></pre>
                      */
                     onLeafClick: undefined,
+
+                    /**
+                     * @callback external:jQuery.external:fn.topicmap~onNodeTitleClick
+                     * @param {external:jQuery.external:fn.topicmap~Node} node the clicked node.
+                     * @param {string[]} names an array of node names, from the clicked node up to the root.
+                     * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called.
+                     * @param {Event} evt the click event.
+                     * @example
+                     * <pre><code>
+                     $('#paper').topicmap({
+    onNodeTitleClick: function(node, names, clusterSentiment) {
+        alert('You clicked on node with title: ' + node.name);
+    }
+});
+                    onNodeTitleClick: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout.
