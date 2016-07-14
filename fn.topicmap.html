@@ -1020,7 +1020,7 @@ $(&#x27;#paper&#x27;).topicmap({});
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-287">line 287</a>
+				 <a href="topicmap.js.html#sunlight-1-line-302">line 302</a>
 			</li>
 		</ul>
 	</dd>
@@ -1104,7 +1104,7 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;animate&#x27;, false, false);
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-175">line 175</a>
+				 <a href="topicmap.js.html#sunlight-1-line-190">line 190</a>
 			</li>
 		</ul>
 	</dd>
@@ -1262,7 +1262,7 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;clear&#x27;);
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-269">line 269</a>
+				 <a href="topicmap.js.html#sunlight-1-line-284">line 284</a>
 			</li>
 		</ul>
 	</dd>
@@ -1495,7 +1495,7 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;clear&#x27;);
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-193">line 193</a>
+				 <a href="topicmap.js.html#sunlight-1-line-208">line 208</a>
 			</li>
 		</ul>
 	</dd>
@@ -1727,7 +1727,7 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;showLoader&#x27;, &#x27;lib&#x2F;autn&#x2F;
             
                 
 <dt>
-    <h4 class="name" id="onLayoutCreation"><span class="type-signature"></span>onLayoutCreation<span class="signature">(treemap)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="onLayoutCreation"><span class="type-signature"></span>onLayoutCreation<span class="signature">(node, names, clusterSentiment, evt, treemap)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -1761,6 +1761,98 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;showLoader&#x27;, &#x27;lib&#x2F;autn&#x2F;
 	</thead>
 
 	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>node</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="fn.topicmap.html#Node">external:jQuery.external:fn.topicmap~Node</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the clicked node.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>names</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string[]</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>an array of node names, from the clicked node up to the root.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>clusterSentiment</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>whether the clusterSentiment parameter was set when renderData() was called.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>evt</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Event</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the click event.</p></td>
+        </tr>
+
 	
 
         <tr>
@@ -1818,7 +1910,7 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;showLoader&#x27;, &#x27;lib&#x2F;autn&#x2F;
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-120">line 120</a>
+				 <a href="topicmap.js.html#sunlight-1-line-121">line 121</a>
 			</li>
 		</ul>
 	</dd>
@@ -1843,8 +1935,17 @@ $(&#x27;#paper&#x27;).topicmap(&#x27;showLoader&#x27;, &#x27;lib&#x2F;autn&#x2F;
     
     
     
-        <h5>Example</h5>
+        <h5>Examples</h5>
         
+    <pre class="sunlight-highlight-javascript">&lt;pre&gt;&lt;code&gt;
+                     $(&#x27;#paper&#x27;).topicmap({
+    onNodeTitleClick: function(node, names, clusterSentiment) {
+        alert(&#x27;You clicked on node with title: &#x27; + node.name);
+    }
+});
+                    onNodeTitleClick: undefined,
+                    &#x2F;**</pre>
+
     <pre class="sunlight-highlight-javascript">&lt;pre&gt;&lt;code&gt;
 $(&#x27;#paper&#x27;).topicmap({
     onLayoutCreation: function(layout) {
@@ -2153,7 +2254,7 @@ $(&#x27;#paper&#x27;).topicmap({
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-133">line 133</a>
+				 <a href="topicmap.js.html#sunlight-1-line-148">line 148</a>
 			</li>
 		</ul>
 	</dd>
@@ -2286,7 +2387,7 @@ $(&#x27;#paper&#x27;).topicmap({
 		<ul class="dummy">
 			<li>
 				<a href="topicmap.js.html">topicmap.js</a>,
-				 <a href="topicmap.js.html#sunlight-1-line-146">line 146</a>
+				 <a href="topicmap.js.html#sunlight-1-line-161">line 161</a>
 			</li>
 		</ul>
 	</dd>
@@ -2349,7 +2450,7 @@ $(&#x27;#paper&#x27;).topicmap({
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Mon Jun 6th 12:18 2016 using the <a
+		on Thu Jul 14th 17:31 2016 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
