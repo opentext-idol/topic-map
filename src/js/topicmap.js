@@ -117,6 +117,21 @@ $('#paper').topicmap({
                      * </code></pre>
                      */
                     onLeafClick: undefined,
+
+                    /**
+                     * @callback external:jQuery.external:fn.topicmap~onNodeTitleClick
+                     * @param {external:jQuery.external:fn.topicmap~Node} node the clicked node.
+                     * @param {string[]} names an array of node names, from the clicked node up to the root.
+                     * @param {boolean} clusterSentiment whether the clusterSentiment parameter was set when renderData() was called.
+                     * @param {Event} evt the click event.
+                     * @example
+                     * <pre><code>
+                     $('#paper').topicmap({
+    onNodeTitleClick: function(node, names, clusterSentiment) {
+        alert('You clicked on node with title: ' + node.name);
+    }
+});
+                    onNodeTitleClick: undefined,
                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout.
@@ -815,7 +830,20 @@ $('#paper').topicmap('animate', false, false);
                                 opacity: depth <=2 ? baseOpacity : 1
                             });
 
-                            $(textEl.node).css('pointer-events', 'none');
+                            if (options.onNodeTitleClick ) {
+                                textEl.hover(function () {
+                                    textEl.scale(1.05);
+                                }, function () {
+                                    textEl.scale(1 / 1.05);
+                                });
+                            }
+
+                            var names = [];
+                            for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
+
+                            textEl.click(function() {
+                                options.onNodeTitleClick  && options.onNodeTitleClick (node, names);
+                            });
 
                             var poly = d3.geom.polygon(node.poly);
                             var horz = poly.clip([[0, centroidY], [width, centroidY]]);
@@ -901,8 +929,7 @@ $('#paper').topicmap('animate', false, false);
                                     node.animating = true;
                                     return;
                                 }
-                                var names = [];
-                                for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
+
                                 onLeafClick && onLeafClick(node, names, clusterSentiment, evt);
                             });
 
