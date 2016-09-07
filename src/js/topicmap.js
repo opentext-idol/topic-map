@@ -8,12 +8,12 @@
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
-        define(['topicmap/js/wordwrap', 'jquery', 'underscore', 'd3', 'raphael'], factory);
+        define(['./wordwrap', 'jquery', 'underscore', 'Raphael', 'd3'], factory);
     } else {
         // We're using plain javascript imports, create jQuery plugin using imports from the Autn namespace.
         factory(autn.vis.util.wordWrap, jQuery, _);
     }
-}(function (wordWrap, $, _) {
+}(function (wordWrap, $, _, Raphael) {
     /**
      *  @typedef external:jQuery.external:fn.topicmap~Node
      *  @type {object}
@@ -804,8 +804,27 @@ $('#paper').topicmap('animate', false, false);
                             node.path.attr('path', newPath);
                         }
                         else {
+                            var fillOpacity = node.children ? 0.9 : 1;
+
                             node.path = paper.path(newPath)
-                                    .attr({fill: '330-'+node.color+'-'+node.color2, 'fill-opacity': node.children ? 0.9 : 1, stroke: 'white', 'stroke-width': node.children ? 8/(node.depth + 1) : 4, 'stroke-opacity': node.children ? 0.2 : 0.7});
+                                .attr({
+                                    fill: '330-'+node.color+'-'+node.color2,
+                                    'fill-opacity': fillOpacity,
+                                    stroke: 'white',
+                                    'stroke-width': node.children ? 8/(node.depth + 1) : 4,
+                                    'stroke-opacity': node.children ? 0.2 : 0.7
+                                });
+
+                            /*
+                             * There is a bug in the Raphael attr() method which means the call above will not set fill-opacity.
+                             * The <path> elements created by Raphael have a fill attribute which refers to a <lineargradient>
+                             * by URL. The attr method tries to parse this fill attribute incorrectly.
+                             * Relates to commit 48491c87c51b41b24778d6b51e674966542555a4 in the Raphael JS repo.
+                             * TODO: Remove this once Raphael is fixed
+                             */
+                            $(node.path.node)
+                                .attr('fill-opacity', fillOpacity)
+                                .css('fill-opacity', fillOpacity);
                         }
                     });
 
@@ -865,7 +884,7 @@ $('#paper').topicmap('animate', false, false);
                                 });
 
                                 if (deduped.length >= 3 && deduped.length < node.poly.length) {
-                                    poly = d3.geom.polygon(deduped); 
+                                    poly = d3.geom.polygon(deduped);
                                     horz = poly.clip([[0, centroidY], [width, centroidY]]);
                                 }
                             }
@@ -1188,7 +1207,7 @@ $('#paper').topicmap('animate', false, false);
 
             animateLoop();
         }
-        
+
         function animateLoop() {
             var finished;
 
