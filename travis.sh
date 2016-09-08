@@ -1,5 +1,7 @@
 #!/bin/bash
 
+node_modules/grunt-cli/bin/grunt test
+
 if [[ $TRAVIS_BRANCH == 'master' ]]
 then
   git config credential.helper "store --file=.git/credentials"
