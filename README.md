@@ -15,6 +15,9 @@ This repo uses git-flow. develop is the development branch. master is the last k
 
 * grunt doc : Generates project documentation
 * grunt watch-doc : Watches for changes and regenerates the documentation
+* grunt test : Run the jasmine specs and print the results to the console
+* grunt browser-test : Start a web server for running the jasmine specs in the browser
+* grunt lint : Run the JSHint checks and print the ersults to the console
 
 ## Known Issues
 * Topic Map depends on Raphael version 2.1.2 because of a bug in Raphael 2.1.3+ this will be fixed when the bug in Raphael is closed.

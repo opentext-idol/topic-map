@@ -1,7 +1,7 @@
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
-        define(['jquery', 'raphael'], factory);
+        define(['jquery', 'Raphael'], factory);
     } else {
         // We're using plain javascript imports, namespace everything in the Autn namespace.
         (function(scope, namespace){
