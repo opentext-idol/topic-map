@@ -861,7 +861,14 @@ $('#paper').topicmap('animate', false, false);
                             for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
 
                             textEl.click(function() {
-                                options.onNodeTitleClick  && options.onNodeTitleClick (node, names);
+                                if (options.onNodeTitleClick) {
+                                    options.onNodeTitleClick (node, names);
+                                }
+                                else {
+                                    if (node.children) {
+                                        onLeftClick(node);
+                                    }
+                                }
                             });
 
                             var poly = d3.geom.polygon(node.poly);
@@ -938,14 +945,7 @@ $('#paper').topicmap('animate', false, false);
                                 }
 
                                 if (node.children) {
-                                    var anim = Raphael.animation({opacity: 0}, 500, undefined, function(){
-                                        node.path.hide();
-                                        node.textEl && node.textEl.hide();
-                                        node.animating = false;
-                                    });
-                                    node.path.animate(anim);
-                                    node.textEl && node.textEl.animateWith(node.path, anim, anim);
-                                    node.animating = true;
+                                    onLeftClick(node);
                                     return;
                                 }
 
@@ -953,6 +953,17 @@ $('#paper').topicmap('animate', false, false);
                             });
 
                             onNodeRender && onNodeRender(node);
+
+                            function onLeftClick(node) {
+                                var anim = Raphael.animation({opacity: 0}, 500, undefined, function () {
+                                    node.path.hide();
+                                    node.textEl && node.textEl.hide();
+                                    node.animating = false;
+                                });
+                                node.path.animate(anim);
+                                node.textEl && node.textEl.animateWith(node.path, anim, anim);
+                                node.animating = true;
+                            }
 
                             function onRightClick(node) {
                                 if (node.animating) {return;}
