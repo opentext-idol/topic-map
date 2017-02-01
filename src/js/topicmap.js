@@ -56,6 +56,18 @@
          *      If set, animations will be skipped. There may be a noticeable pause if we skip animation,
          *      since javascript is single threaded and it'll take a while to compute the final positions. The browser
          *      may also give a warning if it takes too long.
+         * @param {number} [options.animationDelay=25]
+         *      The time (in ms) between animation frames; if skipAnimation=true is not set.
+         * @param {number} [options.animationStepIncrement=1]
+         *      How many layout calculation steps to take before each redraw when animating.
+         * @param {number} [options.textFadeStartDelay=300]
+         *      After node animation completes, we fade in the text, starting from the first node.
+         *      textFadeStartDelay controls the delay (in ms) between starting to fade in each text node.
+         * @param {number} [options.textFadeMaxDelay=3000]
+         *      If there are many nodes, textFadeStartDelay may take a long time to fade in all the text, so
+         *      textFadeMaxDelay puts an maximum limit on the time before fading in all the text (in ms).
+         * @param {number} [options.textFadeDuration=1000]
+         *      The time (in ms) the text for a node should take to fade in.
          * @param {external:jQuery.external:fn.topicmap~onLeafClick} [options.onLeafClick]
          *      Click handler when a node is left-clicked.
          * @param {external:jQuery.external:fn.topicmap~onLayoutCreation} [options.onLayoutCreation]
@@ -75,7 +87,13 @@
          * @param {string} [options.i18n.autn.vis.topicmap.noResultsAvailable='No results available, please try a different query'] string shown when no results are available.
          * @example
          *      <pre><code>
-$('#paper').topicmap({});
+         $('#paper').topicmap({
+    textFadeStartDelay: 0,
+    textFadeMaxDelay: 100,
+    textFadeDuration: 100,
+    animationDelay: 5,
+    animationStepIncrement: 3
+});
          *      </code></pre>
          * */
         init: function(options) {
@@ -109,7 +127,7 @@ $('#paper').topicmap({});
                      * @param {Event} evt the click event.
                      * @example
                      * <pre><code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onLeafClick: function(node, names, clusterSentiment) {
         alert('You clicked on node with hierarchy: ' + names.join(', '));
     }
@@ -131,13 +149,13 @@ $('#paper').topicmap({
         alert('You clicked on node with title: ' + node.name);
     }
 });
-                    onNodeTitleClick: undefined,
-                    /**
+                     onNodeTitleClick: undefined,
+                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout.
                      * @example
                      * <pre><code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onLayoutCreation: function(layout) {
         layout.sort(function (a, b) { return a.size - b.size; })
     }
@@ -150,7 +168,7 @@ $('#paper').topicmap({
                      * @param {external:jQuery.external:fn.topicmap~Node} node the node which has just been rendered.
                      * @example
                      * <pre><code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onNodeRender: function(node) {
         console.log('rendered node', node);
     }
@@ -163,7 +181,7 @@ $('#paper').topicmap({
                      * @param {object} vtx the hovered vertex.
                      * @example
                      * <pre><code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onVertexHover: function(node) {
         console.log('hovered node', node);
     }
@@ -184,7 +202,7 @@ $('#paper').topicmap({
          * Clears the topicmap.
          * @example
          *      <pre><code>
-$('#paper').topicmap('clear');
+         $('#paper').topicmap('clear');
          *      </code></pre>
          */
         clear: function() {
@@ -202,7 +220,7 @@ $('#paper').topicmap('clear');
          * @param {number} loaderH height of image.
          * @example
          *      <pre><code>
-$('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
+         $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
          *      </code></pre>
          */
         showLoader: function(path, loaderW, loaderH) {
@@ -224,7 +242,7 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
          *      If true, nodes will be coloured based on their sentiment values and the sentiment legend will be shown.
          * @example
          *   <pre><code>
- $('#paper').topicmap('renderData', {
+         $('#paper').topicmap('renderData', {
     "name": "feeling",
     "size": 1.0,
     "sentiment": null,
@@ -296,7 +314,7 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
          *
          * @example
          *      <pre><code>
-$('#paper').topicmap('animate', false, false);
+         $('#paper').topicmap('animate', false, false);
          *      </code></pre>
          */
         animate: function(animate, singleStep) {
@@ -306,6 +324,26 @@ $('#paper').topicmap('animate', false, false);
                     pluginMeta.animate(animate, singleStep);
                 }
             });
+        },
+        /**
+         * Exports the path data from the topic map .
+         *
+         * @example
+         *      <pre><code>
+         $('#paper').exportPaths();
+         *      </code></pre>
+         */
+        exportPaths: function() {
+            var toReturn
+
+            $(this).each(function(){
+                var dom = $(this), pluginMeta = dom.data('topicmap');
+                if (pluginMeta) {
+                    toReturn = pluginMeta.exportPaths();
+                }
+            });
+
+            return toReturn
         }
     };
 
@@ -328,7 +366,7 @@ $('#paper').topicmap('animate', false, false);
 
         dom.bind('contextmenu.topicmap', function(){ return false; });
         var width = dom.width(),
-                height = dom.height(), area = width * height;
+            height = dom.height(), area = width * height;
 
         var paper = Raphael(dom[0], width, height), mesh;
 
@@ -347,8 +385,16 @@ $('#paper').topicmap('animate', false, false);
         var maxLeafFont = options.maxLeafFont;
         var minAreaSize = options.minAreaSize;
         var enforceLabelBounds = options.enforceLabelBounds;
+        var textFadeStartDelay = _.isNumber(options.textFadeStartDelay) ? options.textFadeStartDelay : 300;
+        var textFadeMaxDelay = _.isNumber(options.textFadeMaxDelay) ? options.textFadeMaxDelay : 3000;
+        var textFadeDuration = _.isNumber(options.textFadeDuration) ? options.textFadeDuration : 1000;
+        var animationDelay = options.animationDelay || 25;
+        var animationStepIncrement = options.animationStepIncrement || 1;
 
         pluginMeta.renderData = renderData;
+        pluginMeta.exportPaths = function(){
+            return mesh && mesh.exportPaths()
+        };
         pluginMeta.animate = function(animate, singleStep){
             if (!mesh) {
                 return;
@@ -387,9 +433,9 @@ $('#paper').topicmap('animate', false, false);
             var maxDepth = 0;
 
             var treemap = d3.layout.treemap()
-                    .padding(0)
-                    .size([width, height])
-                    .value(function(d) { return d.size; });
+                .padding(0)
+                .size([width, height])
+                .value(function(d) { return d.size; });
 
             onLayoutCreation && onLayoutCreation(treemap);
 
@@ -565,7 +611,7 @@ $('#paper').topicmap('animate', false, false);
                         var withinLimit2 = nextVtx[withinProp];
                         if (testVtx[matchProp] === vertex[matchProp]
                             && (withinNum <= withinLimit1 && withinNum >= withinLimit2
-                                || withinNum >= withinLimit1 && withinNum <= withinLimit2)) {
+                            || withinNum >= withinLimit1 && withinNum <= withinLimit2)) {
                             vertex.constrainToEdge(testVtx, nextVtx);
                             return;
                         }
@@ -673,8 +719,8 @@ $('#paper').topicmap('animate', false, false);
                         child.vertices.sort(function(a,b){
                             var diff = b.tmpAngle - a.tmpAngle;
                             return diff ||
-                               (Math.atan2(b.y + b.shift - midY, b.x + b.shift - midX)
-                                   - Math.atan2(a.y + a.shift - midY, a.x + a.shift - midX));
+                                (Math.atan2(b.y + b.shift - midY, b.x + b.shift - midX)
+                                - Math.atan2(a.y + a.shift - midY, a.x + a.shift - midX));
                         });
                         delete child.requiresSort;
                     }
@@ -695,6 +741,22 @@ $('#paper').topicmap('animate', false, false);
 
             function throwError(err) {
                 throw new Error(arguments[0] || 'should not happen');
+            }
+
+            this.exportPaths = function() {
+                return depthPolyMeta.map(function(meta, depth){
+                    return meta.polygons.map(function(polygon){
+                        return {
+                            name: polygon.name,
+                            color: polygon.color,
+                            color2: polygon.color2,
+                            opacity: depth > 1 ? 1 : 0.8,
+                            points: polygon.vertices.map(function(vtx){
+                                return [vtx.x/width, vtx.y/height]
+                            })
+                        }
+                    })
+                })
             }
 
             this.step = function() {
@@ -936,9 +998,9 @@ $('#paper').topicmap('animate', false, false);
                                 }
 
                                 delayedReappear = node.parent && node.parent.path ? setTimeout(function(){
-                                    onRightClick(node);
-                                    suppressClick = true;
-                                }, 500) : null;
+                                        onRightClick(node);
+                                        suppressClick = true;
+                                    }, 500) : null;
                             }).click(function (evt, x, y){
                                 if (node.animating || evt.ctrlKey || suppressClick) {
                                     return;
@@ -987,12 +1049,12 @@ $('#paper').topicmap('animate', false, false);
                         setTimeout(function(){
                             for (depth = Math.min(2, maxDepth); depth >= 1; --depth) {
                                 var polygons = depthPolyMeta[depth].polygons;
-                                var baseDelay = Math.min(300, 3000 / polygons.length);
+                                var baseDelay = Math.min(textFadeStartDelay, textFadeMaxDelay / polygons.length);
                                 depthPolyMeta[depth].polygons.forEach(function (node, nodeIdx) {
                                     node.animating = true;
 
                                     if (node.textEl) {
-                                        node.textEl.animate(Raphael.animation({opacity: 1}, 1000, undefined, function(){
+                                        node.textEl.animate(Raphael.animation({opacity: 1}, textFadeDuration, undefined, function(){
                                             node.animating = false;
                                         }).delay(baseDelay * nodeIdx));
                                     }
@@ -1184,7 +1246,7 @@ $('#paper').topicmap('animate', false, false);
                     'font-size': 12,
                     opacity: 0.1
                 }).animate({opacity: 1}, 500);
-               return;
+                return;
             }
 
             if (clusterSentiment && !hideLegend) {
@@ -1223,12 +1285,16 @@ $('#paper').topicmap('animate', false, false);
             var finished;
 
             if (!isDragging) {
+                // Optionally take multiple steps before each redraw
+                for (var ii = 1; ii < animationStepIncrement; ++ii) {
+                    mesh.step();
+                }
                 finished = mesh.step();
                 mesh.redraw();
             }
 
             if (continuousAnimate && !finished) {
-                animateTimeout = setTimeout(animateLoop, 25);
+                animateTimeout = setTimeout(animateLoop, animationDelay);
             }
         }
     }
