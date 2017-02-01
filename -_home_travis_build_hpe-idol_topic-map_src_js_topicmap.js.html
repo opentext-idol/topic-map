@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>HP Autonomy Topic Map Source: topicmap.js</title>
+	<title>HP Autonomy Topic Map Source: /home/travis/build/hpe-idol/topic-map/src/js/topicmap.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -21,20 +21,6 @@
 			<a class="brand" href="index.html">HP Autonomy Topic Map</a>
 			<ul class="nav">
 				
-				<li class="dropdown">
-					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
-						class="caret"></b></a>
-
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="fn.topicmap.html">external:jQuery.external:fn.topicmap</a>
-						</li>
-						
-
-					</ul>
-				</li>
-				
 			</ul>
 		</div>
 	</div>
@@ -48,7 +34,7 @@
 					
 
 
-		<h1 class="page-title">Source: topicmap.js</h1>
+		<h1 class="page-title">Source: /home/travis/build/hpe-idol/topic-map/src/js/topicmap.js</h1>
     
 <section>
 	<article>
@@ -61,14 +47,14 @@
  * @see topicmap.html/topicmap-require.html in the sample project as an example of integration with a working backend.
  */
 (function (factory) {
-    if (typeof define === 'function' && define.amd) {
+    if (typeof define === 'function' &amp;&amp; define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
-        define(['topicmap/js/wordwrap', 'jquery', 'underscore', 'd3', 'raphael'], factory);
+        define(['./wordwrap', 'jquery', 'underscore', 'Raphael', 'd3'], factory);
     } else {
         // We're using plain javascript imports, create jQuery plugin using imports from the Autn namespace.
         factory(autn.vis.util.wordWrap, jQuery, _);
     }
-}(function (wordWrap, $, _) {
+}(function (wordWrap, $, _, Raphael) {
     /**
      *  @typedef external:jQuery.external:fn.topicmap~Node
      *  @type {object}
@@ -111,6 +97,18 @@
          *      If set, animations will be skipped. There may be a noticeable pause if we skip animation,
          *      since javascript is single threaded and it'll take a while to compute the final positions. The browser
          *      may also give a warning if it takes too long.
+         * @param {number} [options.animationDelay=25]
+         *      The time (in ms) between animation frames; if skipAnimation=true is not set.
+         * @param {number} [options.animationStepIncrement=1]
+         *      How many layout calculation steps to take before each redraw when animating.
+         * @param {number} [options.textFadeStartDelay=300]
+         *      After node animation completes, we fade in the text, starting from the first node.
+         *      textFadeStartDelay controls the delay (in ms) between starting to fade in each text node.
+         * @param {number} [options.textFadeMaxDelay=3000]
+         *      If there are many nodes, textFadeStartDelay may take a long time to fade in all the text, so
+         *      textFadeMaxDelay puts an maximum limit on the time before fading in all the text (in ms).
+         * @param {number} [options.textFadeDuration=1000]
+         *      The time (in ms) the text for a node should take to fade in.
          * @param {external:jQuery.external:fn.topicmap~onLeafClick} [options.onLeafClick]
          *      Click handler when a node is left-clicked.
          * @param {external:jQuery.external:fn.topicmap~onLayoutCreation} [options.onLayoutCreation]
@@ -130,7 +128,13 @@
          * @param {string} [options.i18n.autn.vis.topicmap.noResultsAvailable='No results available, please try a different query'] string shown when no results are available.
          * @example
          *      &lt;pre>&lt;code>
-$('#paper').topicmap({});
+         $('#paper').topicmap({
+    textFadeStartDelay: 0,
+    textFadeMaxDelay: 100,
+    textFadeDuration: 100,
+    animationDelay: 5,
+    animationStepIncrement: 3
+});
          *      &lt;/code>&lt;/pre>
          * */
         init: function(options) {
@@ -164,7 +168,7 @@ $('#paper').topicmap({});
                      * @param {Event} evt the click event.
                      * @example
                      * &lt;pre>&lt;code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onLeafClick: function(node, names, clusterSentiment) {
         alert('You clicked on node with hierarchy: ' + names.join(', '));
     }
@@ -186,13 +190,13 @@ $('#paper').topicmap({
         alert('You clicked on node with title: ' + node.name);
     }
 });
-                    onNodeTitleClick: undefined,
-                    /**
+                     onNodeTitleClick: undefined,
+                     /**
                      * @callback external:jQuery.external:fn.topicmap~onLayoutCreation
                      * @param {d3.layout.treemap} treemap the d3.layout.treemap which will be used for initial node layout.
                      * @example
                      * &lt;pre>&lt;code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onLayoutCreation: function(layout) {
         layout.sort(function (a, b) { return a.size - b.size; })
     }
@@ -205,7 +209,7 @@ $('#paper').topicmap({
                      * @param {external:jQuery.external:fn.topicmap~Node} node the node which has just been rendered.
                      * @example
                      * &lt;pre>&lt;code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onNodeRender: function(node) {
         console.log('rendered node', node);
     }
@@ -218,7 +222,7 @@ $('#paper').topicmap({
                      * @param {object} vtx the hovered vertex.
                      * @example
                      * &lt;pre>&lt;code>
-$('#paper').topicmap({
+                     $('#paper').topicmap({
     onVertexHover: function(node) {
         console.log('hovered node', node);
     }
@@ -229,7 +233,7 @@ $('#paper').topicmap({
                 }, options, {
                     i18n: $.extend({
                         'autn.vis.topicmap.noResultsAvailable': 'No results available, please try a different query'
-                    }, options && options.i18n)
+                    }, options &amp;&amp; options.i18n)
                 });
 
                 setupPlugin(dom, options, pluginMeta);
@@ -239,7 +243,7 @@ $('#paper').topicmap({
          * Clears the topicmap.
          * @example
          *      &lt;pre>&lt;code>
-$('#paper').topicmap('clear');
+         $('#paper').topicmap('clear');
          *      &lt;/code>&lt;/pre>
          */
         clear: function() {
@@ -257,7 +261,7 @@ $('#paper').topicmap('clear');
          * @param {number} loaderH height of image.
          * @example
          *      &lt;pre>&lt;code>
-$('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
+         $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 15);
          *      &lt;/code>&lt;/pre>
          */
         showLoader: function(path, loaderW, loaderH) {
@@ -279,7 +283,7 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
          *      If true, nodes will be coloured based on their sentiment values and the sentiment legend will be shown.
          * @example
          *   &lt;pre>&lt;code>
- $('#paper').topicmap('renderData', {
+         $('#paper').topicmap('renderData', {
     "name": "feeling",
     "size": 1.0,
     "sentiment": null,
@@ -351,7 +355,7 @@ $('#paper').topicmap('showLoader', 'lib/autn/vis/util/img/ajax-loader.gif', 18, 
          *
          * @example
          *      &lt;pre>&lt;code>
-$('#paper').topicmap('animate', false, false);
+         $('#paper').topicmap('animate', false, false);
          *      &lt;/code>&lt;/pre>
          */
         animate: function(animate, singleStep) {
@@ -361,6 +365,26 @@ $('#paper').topicmap('animate', false, false);
                     pluginMeta.animate(animate, singleStep);
                 }
             });
+        },
+        /**
+         * Exports the path data from the topic map .
+         *
+         * @example
+         *      &lt;pre>&lt;code>
+         $('#paper').exportPaths();
+         *      &lt;/code>&lt;/pre>
+         */
+        exportPaths: function() {
+            var toReturn
+
+            $(this).each(function(){
+                var dom = $(this), pluginMeta = dom.data('topicmap');
+                if (pluginMeta) {
+                    toReturn = pluginMeta.exportPaths();
+                }
+            });
+
+            return toReturn
         }
     };
 
@@ -383,7 +407,7 @@ $('#paper').topicmap('animate', false, false);
 
         dom.bind('contextmenu.topicmap', function(){ return false; });
         var width = dom.width(),
-                height = dom.height(), area = width * height;
+            height = dom.height(), area = width * height;
 
         var paper = Raphael(dom[0], width, height), mesh;
 
@@ -402,8 +426,16 @@ $('#paper').topicmap('animate', false, false);
         var maxLeafFont = options.maxLeafFont;
         var minAreaSize = options.minAreaSize;
         var enforceLabelBounds = options.enforceLabelBounds;
+        var textFadeStartDelay = _.isNumber(options.textFadeStartDelay) ? options.textFadeStartDelay : 300;
+        var textFadeMaxDelay = _.isNumber(options.textFadeMaxDelay) ? options.textFadeMaxDelay : 3000;
+        var textFadeDuration = _.isNumber(options.textFadeDuration) ? options.textFadeDuration : 1000;
+        var animationDelay = options.animationDelay || 25;
+        var animationStepIncrement = options.animationStepIncrement || 1;
 
         pluginMeta.renderData = renderData;
+        pluginMeta.exportPaths = function(){
+            return mesh &amp;&amp; mesh.exportPaths()
+        };
         pluginMeta.animate = function(animate, singleStep){
             if (!mesh) {
                 return;
@@ -442,11 +474,11 @@ $('#paper').topicmap('animate', false, false);
             var maxDepth = 0;
 
             var treemap = d3.layout.treemap()
-                    .padding(0)
-                    .size([width, height])
-                    .value(function(d) { return d.size; });
+                .padding(0)
+                .size([width, height])
+                .value(function(d) { return d.size; });
 
-            onLayoutCreation && onLayoutCreation(treemap);
+            onLayoutCreation &amp;&amp; onLayoutCreation(treemap);
 
             var treenodes = treemap(json);
             var root = treenodes[0].data || treenodes[0];
@@ -560,7 +592,7 @@ $('#paper').topicmap('animate', false, false);
                         return;
                     }
 
-                    if (clusterSentiment && child.sentiment != null) {
+                    if (clusterSentiment &amp;&amp; child.sentiment != null) {
                         // [0, 0.3333]
                         var frac = child.sentiment;
                         child.hue = frac * 0.3333;
@@ -603,8 +635,8 @@ $('#paper').topicmap('animate', false, false);
                     // children must have the of node of any parent node
                     node.vertices.forEach(function(vtx){
                         if ((vtx.x === cLeft || vtx.x === cRight || vtx.y === cTop || vtx.y === cBot)
-                            && vtx.x &lt;= cRight && vtx.x >= cLeft && vtx.y &lt;= cBot && vtx.y >= cTop
-                            && !usedParentKeys[vertexKey(vtx.x, vtx.y)]) {
+                            &amp;&amp; vtx.x &lt;= cRight &amp;&amp; vtx.x >= cLeft &amp;&amp; vtx.y &lt;= cBot &amp;&amp; vtx.y >= cTop
+                            &amp;&amp; !usedParentKeys[vertexKey(vtx.x, vtx.y)]) {
                             child.vertices.push(vtx);
                             child.requiresSort = true;
                         }
@@ -619,8 +651,8 @@ $('#paper').topicmap('animate', false, false);
                         var withinLimit1 = testVtx[withinProp];
                         var withinLimit2 = nextVtx[withinProp];
                         if (testVtx[matchProp] === vertex[matchProp]
-                            && (withinNum &lt;= withinLimit1 && withinNum >= withinLimit2
-                                || withinNum >= withinLimit1 && withinNum &lt;= withinLimit2)) {
+                            &amp;&amp; (withinNum &lt;= withinLimit1 &amp;&amp; withinNum >= withinLimit2
+                            || withinNum >= withinLimit1 &amp;&amp; withinNum &lt;= withinLimit2)) {
                             vertex.constrainToEdge(testVtx, nextVtx);
                             return;
                         }
@@ -655,7 +687,7 @@ $('#paper').topicmap('animate', false, false);
                                         var sibTop = sibPos.y;
                                         var sibRight = sibLeft + sibPos.dx;
                                         var sibBot = sibTop + sibPos.dy;
-                                        if (pt[0] >= sibLeft && pt[0] &lt;= sibRight && pt[1] >= sibTop && pt[1] &lt;= sibBot) {
+                                        if (pt[0] >= sibLeft &amp;&amp; pt[0] &lt;= sibRight &amp;&amp; pt[1] >= sibTop &amp;&amp; pt[1] &lt;= sibBot) {
                                             sibling.requiresSort = true;
                                             sibling.vertices.push(vertex);
                                             break;
@@ -728,8 +760,8 @@ $('#paper').topicmap('animate', false, false);
                         child.vertices.sort(function(a,b){
                             var diff = b.tmpAngle - a.tmpAngle;
                             return diff ||
-                               (Math.atan2(b.y + b.shift - midY, b.x + b.shift - midX)
-                                   - Math.atan2(a.y + a.shift - midY, a.x + a.shift - midX));
+                                (Math.atan2(b.y + b.shift - midY, b.x + b.shift - midX)
+                                - Math.atan2(a.y + a.shift - midY, a.x + a.shift - midX));
                         });
                         delete child.requiresSort;
                     }
@@ -750,6 +782,22 @@ $('#paper').topicmap('animate', false, false);
 
             function throwError(err) {
                 throw new Error(arguments[0] || 'should not happen');
+            }
+
+            this.exportPaths = function() {
+                return depthPolyMeta.map(function(meta, depth){
+                    return meta.polygons.map(function(polygon){
+                        return {
+                            name: polygon.name,
+                            color: polygon.color,
+                            color2: polygon.color2,
+                            opacity: depth > 1 ? 1 : 0.8,
+                            points: polygon.vertices.map(function(vtx){
+                                return [vtx.x/width, vtx.y/height]
+                            })
+                        }
+                    })
+                })
             }
 
             this.step = function() {
@@ -849,7 +897,7 @@ $('#paper').topicmap('animate', false, false);
 
                     polygons.forEach(function (node) {
                         if (!node.vertices) {
-                            typeof console !== 'undefined' && console.log('not implemented yet');
+                            typeof console !== 'undefined' &amp;&amp; console.log('not implemented yet');
                             return;
                         }
 
@@ -859,15 +907,34 @@ $('#paper').topicmap('animate', false, false);
                             node.path.attr('path', newPath);
                         }
                         else {
+                            var fillOpacity = node.children ? 0.9 : 1;
+
                             node.path = paper.path(newPath)
-                                    .attr({fill: '330-'+node.color+'-'+node.color2, 'fill-opacity': node.children ? 0.9 : 1, stroke: 'white', 'stroke-width': node.children ? 8/(node.depth + 1) : 4, 'stroke-opacity': node.children ? 0.2 : 0.7});
+                                .attr({
+                                    fill: '330-'+node.color+'-'+node.color2,
+                                    'fill-opacity': fillOpacity,
+                                    stroke: 'white',
+                                    'stroke-width': node.children ? 8/(node.depth + 1) : 4,
+                                    'stroke-opacity': node.children ? 0.2 : 0.7
+                                });
+
+                            /*
+                             * There is a bug in the Raphael attr() method which means the call above will not set fill-opacity.
+                             * The &lt;path> elements created by Raphael have a fill attribute which refers to a &lt;lineargradient>
+                             * by URL. The attr method tries to parse this fill attribute incorrectly.
+                             * Relates to commit 48491c87c51b41b24778d6b51e674966542555a4 in the Raphael JS repo.
+                             * TODO: Remove this once Raphael is fixed
+                             */
+                            $(node.path.node)
+                                .attr('fill-opacity', fillOpacity)
+                                .css('fill-opacity', fillOpacity);
                         }
                     });
 
                     polyMeta.lastPath = polygons[polygons.length-1].path;
                 }
 
-                if (stable && !renderedStable) {
+                if (stable &amp;&amp; !renderedStable) {
                     renderedStable = true;
                     for (depth = maxDepth; depth >= 1; --depth) {
                         polyMeta = depthPolyMeta[depth];
@@ -897,7 +964,14 @@ $('#paper').topicmap('animate', false, false);
                             for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
 
                             textEl.click(function() {
-                                options.onNodeTitleClick  && options.onNodeTitleClick (node, names);
+                                if (options.onNodeTitleClick) {
+                                    options.onNodeTitleClick (node, names);
+                                }
+                                else {
+                                    if (node.children) {
+                                        onLeftClick(node);
+                                    }
+                                }
                             });
 
                             var poly = d3.geom.polygon(node.poly);
@@ -919,8 +993,8 @@ $('#paper').topicmap('animate', false, false);
                                     }
                                 });
 
-                                if (deduped.length >= 3 && deduped.length &lt; node.poly.length) {
-                                    poly = d3.geom.polygon(deduped); 
+                                if (deduped.length >= 3 &amp;&amp; deduped.length &lt; node.poly.length) {
+                                    poly = d3.geom.polygon(deduped);
                                     horz = poly.clip([[0, centroidY], [width, centroidY]]);
                                 }
                             }
@@ -930,7 +1004,7 @@ $('#paper').topicmap('animate', false, false);
                                 var vert = poly.clip([[centroidX, 0], [centroidX, height]]);
                                 if (vert.length) {
                                     // todo: why is horz sometimes empty?
-                                    Raphael.svg && textEl.attr('x', 0.5 * (horz[0][0] + horz[1][0]));
+                                    Raphael.svg &amp;&amp; textEl.attr('x', 0.5 * (horz[0][0] + horz[1][0]));
                                     var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.5, maxFont, minFont, vert[0][1] - vert[1][1], textEl);
                                     sized = wrapAttrs.fit;
                                 }
@@ -964,43 +1038,47 @@ $('#paper').topicmap('animate', false, false);
                                     delayedReappear = null;
                                 }
 
-                                delayedReappear = node.parent && node.parent.path ? setTimeout(function(){
-                                    onRightClick(node);
-                                    suppressClick = true;
-                                }, 500) : null;
+                                delayedReappear = node.parent &amp;&amp; node.parent.path ? setTimeout(function(){
+                                        onRightClick(node);
+                                        suppressClick = true;
+                                    }, 500) : null;
                             }).click(function (evt, x, y){
                                 if (node.animating || evt.ctrlKey || suppressClick) {
                                     return;
                                 }
 
                                 if (node.children) {
-                                    var anim = Raphael.animation({opacity: 0}, 500, undefined, function(){
-                                        node.path.hide();
-                                        node.textEl && node.textEl.hide();
-                                        node.animating = false;
-                                    });
-                                    node.path.animate(anim);
-                                    node.textEl && node.textEl.animateWith(node.path, anim, anim);
-                                    node.animating = true;
+                                    onLeftClick(node);
                                     return;
                                 }
 
-                                onLeafClick && onLeafClick(node, names, clusterSentiment, evt);
+                                onLeafClick &amp;&amp; onLeafClick(node, names, clusterSentiment, evt);
                             });
 
-                            onNodeRender && onNodeRender(node);
+                            onNodeRender &amp;&amp; onNodeRender(node);
+
+                            function onLeftClick(node) {
+                                var anim = Raphael.animation({opacity: 0}, 500, undefined, function () {
+                                    node.path.hide();
+                                    node.textEl &amp;&amp; node.textEl.hide();
+                                    node.animating = false;
+                                });
+                                node.path.animate(anim);
+                                node.textEl &amp;&amp; node.textEl.animateWith(node.path, anim, anim);
+                                node.animating = true;
+                            }
 
                             function onRightClick(node) {
                                 if (node.animating) {return;}
-                                if (node.parent && node.parent.path) {
+                                if (node.parent &amp;&amp; node.parent.path) {
                                     var anim = Raphael.animation({opacity: 0.9}, 500, undefined, function(){
                                         node.parent.animating = false;
                                     });
                                     node.parent.path.animate(anim);
-                                    node.parent.textEl && node.parent.textEl.animateWith(node.path, anim, anim);
+                                    node.parent.textEl &amp;&amp; node.parent.textEl.animateWith(node.path, anim, anim);
                                     node.parent.animating = true;
                                     node.parent.path.show();
-                                    node.parent.textEl && node.parent.textEl.show();
+                                    node.parent.textEl &amp;&amp; node.parent.textEl.show();
                                 }
                             }
                         });
@@ -1012,12 +1090,12 @@ $('#paper').topicmap('animate', false, false);
                         setTimeout(function(){
                             for (depth = Math.min(2, maxDepth); depth >= 1; --depth) {
                                 var polygons = depthPolyMeta[depth].polygons;
-                                var baseDelay = Math.min(300, 3000 / polygons.length);
+                                var baseDelay = Math.min(textFadeStartDelay, textFadeMaxDelay / polygons.length);
                                 depthPolyMeta[depth].polygons.forEach(function (node, nodeIdx) {
                                     node.animating = true;
 
                                     if (node.textEl) {
-                                        node.textEl.animate(Raphael.animation({opacity: 1}, 1000, undefined, function(){
+                                        node.textEl.animate(Raphael.animation({opacity: 1}, textFadeDuration, undefined, function(){
                                             node.animating = false;
                                         }).delay(baseDelay * nodeIdx));
                                     }
@@ -1045,10 +1123,10 @@ $('#paper').topicmap('animate', false, false);
                             vtx.marker = paper.circle(vtx.x, vtx.y, 3).attr({fill: vtx.vtxContraints ? 'blue' : 'red'});
 
                             vtx.marker.hover(function(){
-                                vtx.vtxContraints && vtx.vtxContraints.forEach(function(a){a.marker.attr({fill: 'orange'});});
-                                onVertexHover && onVertexHover(vtx);
+                                vtx.vtxContraints &amp;&amp; vtx.vtxContraints.forEach(function(a){a.marker.attr({fill: 'orange'});});
+                                onVertexHover &amp;&amp; onVertexHover(vtx);
                             }, function(){
-                                vtx.vtxContraints && vtx.vtxContraints.forEach(function(a){a.marker.attr({fill: a.vtxContraints ? 'blue' : 'red'});});
+                                vtx.vtxContraints &amp;&amp; vtx.vtxContraints.forEach(function(a){a.marker.attr({fill: a.vtxContraints ? 'blue' : 'red'});});
                             });
 
                             vtx.marker.drag(function(dx,dy, x,y,evt){
@@ -1079,7 +1157,7 @@ $('#paper').topicmap('animate', false, false);
                                 function applyConstraintsForVertex(vtx) {
                                     for (var depth = 0; depth &lt;= maxDepth; ++depth) {
                                         depthPolyMeta[depth].vertices.forEach(function(otherVtx) {
-                                            if (otherVtx.vtxContraints && otherVtx.vtxContraints.indexOf(vtx) !== -1) {
+                                            if (otherVtx.vtxContraints &amp;&amp; otherVtx.vtxContraints.indexOf(vtx) !== -1) {
                                                 otherVtx.applyConstraints();
                                                 applyConstraintsForVertex(otherVtx);
                                             }
@@ -1209,10 +1287,10 @@ $('#paper').topicmap('animate', false, false);
                     'font-size': 12,
                     opacity: 0.1
                 }).animate({opacity: 1}, 500);
-               return;
+                return;
             }
 
-            if (clusterSentiment && !hideLegend) {
+            if (clusterSentiment &amp;&amp; !hideLegend) {
                 width -= 30;
                 var pattern = [90];
 
@@ -1243,17 +1321,21 @@ $('#paper').topicmap('animate', false, false);
 
             animateLoop();
         }
-        
+
         function animateLoop() {
             var finished;
 
             if (!isDragging) {
+                // Optionally take multiple steps before each redraw
+                for (var ii = 1; ii &lt; animationStepIncrement; ++ii) {
+                    mesh.step();
+                }
                 finished = mesh.step();
                 mesh.redraw();
             }
 
-            if (continuousAnimate && !finished) {
-                animateTimeout = setTimeout(animateLoop, 25);
+            if (continuousAnimate &amp;&amp; !finished) {
+                animateTimeout = setTimeout(animateLoop, animationDelay);
             }
         }
     }
@@ -1278,8 +1360,8 @@ $('#paper').topicmap('animate', false, false);
 					<br />
 					
 		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.2</a>
-		on Thu Jul 14th 17:31 2016 using the <a
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a>
+		on Wed Feb 1st 12:48 2017 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>
