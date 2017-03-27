@@ -401,20 +401,20 @@
             }
             if (!animate) {
                 if (animateTimeout) {
-                    animateTimeout = clearTimeout(animateTimeout);
+                    animateTimeout = cancelAnimationFrame(animateTimeout);
                 }
                 return;
             }
 
             continuousAnimate = !singleStep;
             if (animateTimeout) {
-                animateTimeout = clearTimeout(animateTimeout);
+                animateTimeout = cancelAnimationFrame(animateTimeout);
             }
             animateLoop();
         };
         pluginMeta.clear = function() {
             if (animateTimeout) {
-                animateTimeout = clearTimeout(animateTimeout);
+                animateTimeout = cancelAnimationFrame(animateTimeout);
             }
             paper.clear();
             mesh = null;
@@ -1046,7 +1046,7 @@
                     if (!skipAnimation) {
                         // Animations have to be done as a separate step to make it smoother, since the CPU load from
                         // the text position computation means it takes a long time to finish.
-                        setTimeout(function(){
+                        requestAnimationFrame(function(){
                             for (depth = Math.min(2, maxDepth); depth >= 1; --depth) {
                                 var polygons = depthPolyMeta[depth].polygons;
                                 var baseDelay = Math.min(textFadeStartDelay, textFadeMaxDelay / polygons.length);
@@ -1063,7 +1063,7 @@
                                     }
                                 });
                             }
-                        }, 10);
+                        });
                     }
                 }
 
@@ -1221,7 +1221,7 @@
 
         function renderData(json, clusterSentiment) {
             if (animateTimeout) {
-                animateTimeout = clearTimeout(animateTimeout);
+                animateTimeout = cancelAnimationFrame(animateTimeout);
             }
 
             if (json) {
@@ -1281,20 +1281,32 @@
             animateLoop();
         }
 
-        function animateLoop() {
+        var lastDrawnTimestamp;
+
+        function animateLoop(timestamp) {
             var finished;
 
-            if (!isDragging) {
-                // Optionally take multiple steps before each redraw
-                for (var ii = 1; ii < animationStepIncrement; ++ii) {
-                    mesh.step();
+            if (isDragging) {
+                lastDrawnTimestamp = timestamp;
+            } else {
+                var steps = animationStepIncrement;
+
+                if (timestamp && lastDrawnTimestamp) {
+                    steps = (timestamp - lastDrawnTimestamp) / animationDelay * animationStepIncrement;
                 }
-                finished = mesh.step();
-                mesh.redraw();
+
+                if (steps >= 1) {
+                    for (var ii = 0; !finished && ii < steps; ++ii) {
+                        finished = mesh.step();
+                    }
+
+                    mesh.redraw();
+                    lastDrawnTimestamp = timestamp;
+                }
             }
 
             if (continuousAnimate && !finished) {
-                animateTimeout = setTimeout(animateLoop, animationDelay);
+                animateTimeout = requestAnimationFrame(animateLoop);
             }
         }
     }
