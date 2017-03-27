@@ -15,37 +15,16 @@
 }(function ($, Raphael) {
     var sizeMap = {};
 
-    function measureWord(textEl, word, family, size) {
-        // font-size differences don't actually make much difference, mainly just to whitespace, may consider
-        // just linearly scaling them
-        var key = family + ':' + word;
-        var existing = sizeMap[key];
-        if (existing) {
-            return {width: existing[0] * size, height: existing[1] * size};
-        }
-
-        if (curText !== word) { textEl.attr('text', word); curText = word; }
-        if (curFontFamily !== family) { textEl.attr('font-family', family); curFontFamily = family; }
-
-        var bounds = textEl.getBBox();
-
-        // 1/40
-        var wFrac = bounds.width * 0.025;
-        var wHeight = bounds.height * 0.025;
-        sizeMap[key] = [wFrac, wHeight];
-        return {width: wFrac * size, height: wHeight * size};
-    }
-
     function fastLineBreak(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize, linesWhichFit;
-        var lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight, minFontSize === fontSize);
+        var lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight);
         var biggestFitting = Number.MIN_VALUE;
 
         if (lines.fit) {
             biggestFitting = fontSize;
         } else {
             bestSize = binaryChop(minFontSize, fontSize - 1, function(fontSize) {
-                lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight, minFontSize === fontSize);
+                lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight);
                 if (lines.fit && fontSize > biggestFitting) {
                     linesWhichFit = lines;
                     biggestFitting = fontSize;
@@ -61,74 +40,20 @@
         };
     }
 
-    function fastTryTextLayout(text, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight, earlyTermination) {
-        var spaceSize = measureWord(textEl, '\u00A0', fontFamily, fontSize);
-        var spaceW = spaceSize.width;
-        var aveCharH = spaceSize.height;
-
+    function fastTryTextLayout(text, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight) {
         if (padPC) {
+            // TODO: account for this in the width?
             var pad = fontSize * padPC;
             maxWidth -= pad;
             maxHeight -= pad;
         }
 
-        var cursorX = 0, cursorY = 0, lines = [], line = '';
-        var fit = true;
+        textEl.css('font-size', fontSize)
 
-        for (var ii = 0; ii < text.length; ++ii) {
-            var word = text[ii];
-            var wordW = measureWord(textEl, word, fontFamily, fontSize).width;
-
-            if (wordW > maxWidth) {
-                fit = false;
-                if (earlyTermination) {
-                    return {fit: false};
-                }
-                if (line) {
-                    lines.push(line);
-                    cursorY += aveCharH;
-                }
-                lines.push(word);
-                cursorY += aveCharH;
-                cursorX = 0;
-                line = '';
-            }
-            else if (!line) {
-                cursorX = wordW;
-                line = word;
-            }
-            else if (cursorX + spaceW + wordW > maxWidth) {
-                lines.push(line);
-                cursorY += aveCharH;
-                cursorX = wordW;
-                line = word;
-            }
-            else {
-                cursorX += spaceW + wordW;
-                line += '\u00A0' + word;
-            }
-
-            if (cursorY > maxHeight) {
-                fit = false;
-                if (earlyTermination) {
-                    return {fit: false};
-                }
-            }
+        return {
+            fit: textEl.height() < maxHeight,
+            text: text
         }
-
-        if (line) {
-            lines.push(line);
-            cursorY += aveCharH;
-
-            if (cursorY > maxHeight) {
-                fit = false;
-                if (earlyTermination) {
-                    return {fit: false};
-                }
-            }
-        }
-        
-        return {fit: fit, text: lines.join('\n')};
     }
 
     // should return highest integer value which passes testFn, or lowest value otherwise
@@ -245,6 +170,30 @@
             }
         }
     });
+
+    return function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight, textEl) {
+        var terms = text.split(' ');
+
+        if (!layoutEl) {
+            layoutEl = $('<div>').css({ 'font-family': font, 'font-size': 40 }).hide().appendTo(document.body)
+            curText = text;
+            curFontFamily = font;
+        }
+
+        layoutEl.css('width', maxWidth).text(text);
+
+        var lineAttrs = fastLineBreak(terms, layoutEl, maxWidth, padPC ? padPC + 0.15 : 0, font, fontSize, minFontSize, maxHeight);
+
+        if (textEl) {
+            textEl.attr(lineAttrs);
+        }
+
+        return {
+            fit: lineAttrs.fit,
+            text: lineAttrs.text,
+            fontSize: lineAttrs['font-size']
+        };
+    }
 
     return Raphael.vml ? function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight, textEl) {
         var terms = text.split(' ');
