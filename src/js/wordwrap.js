@@ -51,7 +51,7 @@
         textEl.css('font-size', fontSize)
 
         return {
-            fit: textEl.height() < maxHeight,
+            fit: textEl[0].getBoundingClientRect().height < maxHeight,
             text: text
         }
     }
@@ -175,7 +175,7 @@
         var terms = text.split(' ');
 
         if (!layoutEl) {
-            layoutEl = $('<div>').css({ 'font-family': font, 'font-size': 40 }).hide().appendTo(document.body)
+            layoutEl = $('<div>').css({ 'font-family': font, 'font-size': 40 , 'visibility': 'hidden'}).appendTo(document.body)
             curText = text;
             curFontFamily = font;
         }
