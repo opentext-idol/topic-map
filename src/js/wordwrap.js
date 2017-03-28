@@ -79,9 +79,9 @@
         })
 
         var dom = textEl[0];
-        var bounds = dom.getBoundingClientRect();
+
         return {
-            fit: bounds.height < maxHeight - reserved && dom.scrollWidth <= Math.ceil(availWidth),
+            fit: dom.clientHeight <= maxHeight - reserved && dom.scrollWidth <= Math.ceil(availWidth),
             text: text
         }
     }
