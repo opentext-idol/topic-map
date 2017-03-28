@@ -16,7 +16,7 @@
     function fastLineBreak(textInput, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize;
         var lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
-        var biggestFitting = Number.MIN_VALUE;
+        var biggestFitting = -1;
 
         if (lines.fit) {
             biggestFitting = fontSize;
