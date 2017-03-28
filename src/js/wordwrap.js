@@ -99,7 +99,7 @@
         }
     });
 
-    return function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight) {
+    return function(paper, font, maxWidth, maxHeight, text, fontSize, minFontSize) {
         var terms = text.split(' ');
 
         if (!layoutEl) {
@@ -110,17 +110,13 @@
             layoutEl.css('font-family', font);
         }
 
-        var usable = 1 - padPC;
-        var availWidth = Math.ceil(maxWidth * usable);
-        var availHeight = Math.ceil(maxHeight * usable);
-
         layoutEl.css({
-            width: availWidth
+            width: maxWidth
         }).html(terms.map(function(term){
             return '<span>' + _.escape(term) + ' </span>'
         }).join(''));
 
-        var lineAttrs = fastLineBreak(terms, layoutEl, availWidth, fontSize, minFontSize, availHeight);
+        var lineAttrs = fastLineBreak(terms, layoutEl, maxWidth, fontSize, minFontSize, maxHeight);
 
         return {
             fit: lineAttrs.fit,

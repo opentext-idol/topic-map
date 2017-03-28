@@ -938,7 +938,9 @@
                                         textCenterX =  0.5 * (horz[0][0] + horz[1][0]);
                                     }
 
-                                    var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.25, maxFont, minFont, vert[0][1] - vert[1][1]);
+                                    var maxWidth = Math.ceil(0.75 * (horz[0][0] - horz[1][0]));
+                                    var maxHeight = Math.ceil(0.75 * (vert[0][1] - vert[1][1]));
+                                    var wrapAttrs = wordWrap(paper, 'Verdana', maxWidth, maxHeight, node.name, maxFont, minFont);
                                     sized = wrapAttrs.fit;
 
                                     if (sized) {
