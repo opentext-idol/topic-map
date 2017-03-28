@@ -16,38 +16,57 @@
     var sizeMap = {};
 
     function fastLineBreak(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, minFontSize, maxHeight) {
-        var bestSize = fontSize, linesWhichFit;
+        var bestSize = fontSize;
         var lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight);
         var biggestFitting = Number.MIN_VALUE;
 
         if (lines.fit) {
             biggestFitting = fontSize;
         } else {
-            bestSize = binaryChop(minFontSize, fontSize - 1, function(fontSize) {
+            bestSize = binaryChop(minFontSize, fontSize - 1, function (fontSize) {
                 lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight);
                 if (lines.fit && fontSize > biggestFitting) {
-                    linesWhichFit = lines;
                     biggestFitting = fontSize;
                 }
                 return lines.fit;
             });
         }
 
+        var fit = biggestFitting > 0;
+
+        if (fit) {
+            textEl.css('font-size', biggestFitting)
+            var linesWhichFit = [], yOffset, prevLine = [];
+
+            textEl.children().each(function(idx, el) {
+                if (yOffset && el.offsetTop !== yOffset) {
+                    if (prevLine.length) {
+                        linesWhichFit.push(prevLine.join(' '));
+                        prevLine = [];
+                    }
+                }
+
+                prevLine.push(textInput[idx]);
+                yOffset = el.offsetTop;
+            })
+
+            if (prevLine.length) {
+                linesWhichFit.push(prevLine.join(' '));
+            }
+
+            return {
+                fit: fit,
+                text: linesWhichFit.join('\n'),
+                'font-size': bestSize
+            };
+        }
+
         return {
-            fit: biggestFitting > 0,
-            text: (linesWhichFit || lines).text,
-            'font-size': bestSize
-        };
+            fit: false
+        }
     }
 
     function fastTryTextLayout(text, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight) {
-        if (padPC) {
-            // TODO: account for this in the width?
-            var pad = fontSize * padPC;
-            maxWidth -= pad;
-            maxHeight -= pad;
-        }
-
         textEl.css('font-size', fontSize)
 
         return {
@@ -180,7 +199,12 @@
             curFontFamily = font;
         }
 
-        layoutEl.css('width', maxWidth).text(text);
+        layoutEl.css({
+            width: maxWidth,
+            padding: (padPC || 0) + 'em'
+        }).html(terms.map(function(term){
+            return '<span>' + new Option(term).innerHTML + ' </span>'
+        }).join(''));
 
         var lineAttrs = fastLineBreak(terms, layoutEl, maxWidth, padPC ? padPC + 0.15 : 0, font, fontSize, minFontSize, maxHeight);
 
