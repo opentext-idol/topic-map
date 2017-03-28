@@ -69,8 +69,10 @@
     function fastTryTextLayout(text, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight) {
         textEl.css('font-size', fontSize)
 
+        var dom = textEl[0];
+        var bounds = dom.getBoundingClientRect();
         return {
-            fit: textEl[0].getBoundingClientRect().height < maxHeight,
+            fit: bounds.height < maxHeight  && dom.scrollWidth <= Math.ceil(maxWidth),
             text: text
         }
     }
