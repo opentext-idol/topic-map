@@ -964,7 +964,7 @@
                                 if (vert.length) {
                                     // todo: why is horz sometimes empty?
                                     Raphael.svg && textEl.attr('x', 0.5 * (horz[0][0] + horz[1][0]));
-                                    var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.5, maxFont, minFont, vert[0][1] - vert[1][1], textEl);
+                                    var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.25, maxFont, minFont, vert[0][1] - vert[1][1], textEl);
                                     sized = wrapAttrs.fit;
                                 }
                             }

@@ -13,16 +13,16 @@
         autn.vis.util.wordWrap = factory(jQuery, Raphael);
     }
 }(function ($, Raphael) {
-    function fastLineBreak(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, minFontSize, maxHeight) {
+    function fastLineBreak(textInput, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize;
-        var lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight);
+        var lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
         var biggestFitting = Number.MIN_VALUE;
 
         if (lines.fit) {
             biggestFitting = fontSize;
         } else {
             bestSize = binaryChop(minFontSize, fontSize - 1, function (fontSize) {
-                lines = fastTryTextLayout(textInput, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight);
+                lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
                 if (lines.fit && fontSize > biggestFitting) {
                     biggestFitting = fontSize;
                 }
@@ -34,8 +34,7 @@
 
         if (fit) {
             textEl.css({
-                'font-size': biggestFitting,
-                width: maxWidth - padPC * biggestFitting
+                'font-size': biggestFitting
             })
 
             var linesWhichFit = [], yOffset, prevLine = [];
@@ -68,20 +67,15 @@
         }
     }
 
-    function fastTryTextLayout(text, textEl, maxWidth, padPC, fontFamily, fontSize, maxHeight) {
-        var reserved = padPC * fontSize;
-
-        var availWidth = maxWidth - reserved;
-
+    function fastTryTextLayout(text, textEl, maxWidth, maxHeight, fontSize) {
         textEl.css({
-            'font-size': fontSize,
-            width: availWidth
+            'font-size': fontSize
         })
 
         var dom = textEl[0];
 
         return {
-            fit: dom.clientHeight <= maxHeight - reserved && dom.scrollWidth <= Math.ceil(availWidth),
+            fit: dom.clientHeight <= maxHeight && dom.scrollWidth <= maxWidth,
             text: text
         }
     }
@@ -101,7 +95,7 @@
         return low;
     }
 
-    var layoutEl, curPaper;
+    var layoutEl, lastFont, curPaper;
 
     Raphael.eve.on('raphael.clear', function() {
         if (curPaper === this) {
@@ -116,14 +110,23 @@
         var terms = text.split(' ');
 
         if (!layoutEl) {
-            layoutEl = $('<div>').css({ visibility: 'hidden', 'overflow-x': 'hidden'}).appendTo(document.body)
+            layoutEl = $('<div>').css({ visibility: 'hidden', 'overflow-x': 'hidden', 'font-family': font}).appendTo(document.body)
+        }
+        else if (lastFont !== font) {
+            layoutEl.css('font-family', font);
         }
 
-        layoutEl.css('font-family', font).html(terms.map(function(term){
+        var usable = 1 - padPC;
+        var availWidth = Math.ceil(maxWidth * usable);
+        var availHeight = Math.ceil(maxHeight * usable);
+
+        layoutEl.css({
+            width: availWidth
+        }).html(terms.map(function(term){
             return '<span>' + new Option(term).innerHTML + ' </span>'
         }).join(''));
 
-        var lineAttrs = fastLineBreak(terms, layoutEl, maxWidth, padPC ? padPC + 1 : 0, font, fontSize, minFontSize, maxHeight);
+        var lineAttrs = fastLineBreak(terms, layoutEl, availWidth, fontSize, minFontSize, availHeight);
 
         if (textEl) {
             textEl.attr(lineAttrs);
