@@ -1,7 +1,7 @@
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // We're using AMD, e.g. require.js. Register as an anonymous module.
-        define(['jquery', 'Raphael'], factory);
+        define(['jquery', 'Raphael', 'underscore'], factory);
     } else {
         // We're using plain javascript imports, namespace everything in the Autn namespace.
         (function(scope, namespace){
@@ -10,9 +10,9 @@
             }
         })(window, 'autn.vis.util');
 
-        autn.vis.util.wordWrap = factory(jQuery, Raphael);
+        autn.vis.util.wordWrap = factory(jQuery, Raphael, _);
     }
-}(function ($, Raphael) {
+}(function ($, Raphael, _) {
     function fastLineBreak(textInput, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize;
         var lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
@@ -37,27 +37,20 @@
                 'font-size': biggestFitting
             })
 
-            var linesWhichFit = [], yOffset, prevLine = [];
+            var text = '', yOffset, spans = textEl.children();
 
-            textEl.children().each(function(idx, el) {
-                if (yOffset && el.offsetTop !== yOffset) {
-                    if (prevLine.length) {
-                        linesWhichFit.push(prevLine.join(' '));
-                        prevLine = [];
-                    }
+            spans.each(function(idx, el) {
+                var newOffsetTop = el.offsetTop;
+                if (yOffset && newOffsetTop !== yOffset) {
+                    text += '\n'
                 }
-
-                prevLine.push(textInput[idx]);
-                yOffset = el.offsetTop;
+                text += textInput[idx] + ' ';
+                yOffset = newOffsetTop;
             })
-
-            if (prevLine.length) {
-                linesWhichFit.push(prevLine.join(' '));
-            }
 
             return {
                 fit: fit,
-                text: linesWhichFit.join('\n'),
+                text: text,
                 'font-size': bestSize
             };
         }
@@ -123,7 +116,7 @@
         layoutEl.css({
             width: availWidth
         }).html(terms.map(function(term){
-            return '<span>' + new Option(term).innerHTML + ' </span>'
+            return '<span>' + _.escape(term) + ' </span>'
         }).join(''));
 
         var lineAttrs = fastLineBreak(terms, layoutEl, availWidth, fontSize, minFontSize, availHeight);
