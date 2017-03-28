@@ -854,7 +854,7 @@
                     var polyMeta = depthPolyMeta[depth];
                     var polygons = polyMeta.polygons;
 
-                    polygons.forEach(function (node) {
+                    polygons.forEach(function redrawPolygon(node) {
                         if (!node.vertices) {
                             typeof console !== 'undefined' && console.log('not implemented yet');
                             return;
@@ -897,41 +897,11 @@
                     renderedStable = true;
                     for (depth = maxDepth; depth >= 1; --depth) {
                         polyMeta = depthPolyMeta[depth];
-                        polyMeta.polygons.forEach(function (node) {
+                        polyMeta.polygons.forEach(function drawLabel(node) {
                             var minFont = minFontOpt;
                             var maxFont = node.children ? maxFontOpt : maxLeafFont;
                             var centroidX = node.centroid[0];
                             var centroidY = node.centroid[1];
-                            var textEl = paper.text(centroidX, centroidY, node.name).attr({
-                                dy: '.35em', 'text-anchor': 'middle',
-                                fill: 'white',
-                                'font-family': 'Verdana',
-                                'font-weight': 'bold',
-                                'font-size': maxFont,
-                                opacity: depth <=2 ? baseOpacity : 1
-                            });
-
-                            if (options.onNodeTitleClick ) {
-                                textEl.hover(function () {
-                                    textEl.scale(1.05);
-                                }, function () {
-                                    textEl.scale(1 / 1.05);
-                                });
-                            }
-
-                            var names = [];
-                            for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
-
-                            textEl.click(function() {
-                                if (options.onNodeTitleClick) {
-                                    options.onNodeTitleClick (node, names);
-                                }
-                                else {
-                                    if (node.children) {
-                                        onLeftClick(node);
-                                    }
-                                }
-                            });
 
                             var poly = d3.geom.polygon(node.poly);
                             var horz = poly.clip([[0, centroidY], [width, centroidY]]);
@@ -958,23 +928,60 @@
                                 }
                             }
 
-                            var sized = false;
+                            var sized = false, textCenterX = centroidX, text = node.name, fontSize = maxFont;
+
                             if (horz.length) {
                                 var vert = poly.clip([[centroidX, 0], [centroidX, height]]);
                                 if (vert.length) {
                                     // todo: why is horz sometimes empty?
-                                    Raphael.svg && textEl.attr('x', 0.5 * (horz[0][0] + horz[1][0]));
-                                    var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.25, maxFont, minFont, vert[0][1] - vert[1][1], textEl);
+                                    if (Raphael.svg) {
+                                        textCenterX =  0.5 * (horz[0][0] + horz[1][0]);
+                                    }
+
+                                    var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.25, maxFont, minFont, vert[0][1] - vert[1][1]);
                                     sized = wrapAttrs.fit;
+
+                                    if (sized) {
+                                        text = wrapAttrs.text;
+                                        fontSize = wrapAttrs.fontSize;
+                                    }
                                 }
                             }
 
                             if (sized || !enforceLabelBounds) {
+                                var textEl = paper.text(textCenterX, centroidY, text).attr({
+                                    dy: '.35em', 'text-anchor': 'middle',
+                                    fill: 'white',
+                                    'font-family': 'Verdana',
+                                    'font-weight': 'bold',
+                                    'font-size': fontSize,
+                                    opacity: depth <=2 ? baseOpacity : 1
+                                });
+
+                                if (options.onNodeTitleClick ) {
+                                    textEl.hover(function () {
+                                        textEl.scale(1.05);
+                                    }, function () {
+                                        textEl.scale(1 / 1.05);
+                                    });
+                                }
+
+                                var names = [];
+                                for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
+
+                                textEl.click(function() {
+                                    if (options.onNodeTitleClick) {
+                                        options.onNodeTitleClick (node, names);
+                                    }
+                                    else {
+                                        if (node.children) {
+                                            onLeftClick(node);
+                                        }
+                                    }
+                                });
+
                                 textEl.insertAfter(polyMeta.lastPath);
                                 node.textEl = textEl;
-                            }
-                            else {
-                                textEl.remove();
                             }
 
                             // Need to handle right-clicks with mouseup since .click() doesn't catch right-click events

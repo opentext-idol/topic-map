@@ -99,10 +99,11 @@
         }
     });
 
-    return function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight, textEl) {
+    return function(paper, font, maxWidth, text, padPC, fontSize, minFontSize, maxHeight) {
         var terms = text.split(' ');
 
         if (!layoutEl) {
+            // The layout element needs to be visibility: hidden not display: none so we can get clientHeight etc.
             layoutEl = $('<div>').css({ visibility: 'hidden', 'overflow-x': 'hidden', 'font-family': font}).appendTo(document.body)
         }
         else if (lastFont !== font) {
@@ -120,10 +121,6 @@
         }).join(''));
 
         var lineAttrs = fastLineBreak(terms, layoutEl, availWidth, fontSize, minFontSize, availHeight);
-
-        if (textEl) {
-            textEl.attr(lineAttrs);
-        }
 
         return {
             fit: lineAttrs.fit,
