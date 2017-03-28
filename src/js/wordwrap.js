@@ -88,16 +88,7 @@
         return low;
     }
 
-    var layoutEl, lastFont, curPaper;
-
-    Raphael.eve.on('raphael.clear', function() {
-        if (curPaper === this) {
-            if (layoutEl) {
-                layoutEl.remove();
-                layoutEl = null;
-            }
-        }
-    });
+    var layoutEl, lastFont;
 
     return function(paper, font, maxWidth, maxHeight, text, fontSize, minFontSize) {
         var terms = text.split(' ');
