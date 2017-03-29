@@ -1,3 +1,8 @@
+/*
+ * Copyright 2016-2017 Hewlett Packard Enterprise Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
 /**
  * @fileOverview
  * Topicmap jQuery plugin
@@ -401,20 +406,20 @@
             }
             if (!animate) {
                 if (animateTimeout) {
-                    animateTimeout = clearTimeout(animateTimeout);
+                    animateTimeout = cancelAnimationFrame(animateTimeout);
                 }
                 return;
             }
 
             continuousAnimate = !singleStep;
             if (animateTimeout) {
-                animateTimeout = clearTimeout(animateTimeout);
+                animateTimeout = cancelAnimationFrame(animateTimeout);
             }
             animateLoop();
         };
         pluginMeta.clear = function() {
             if (animateTimeout) {
-                animateTimeout = clearTimeout(animateTimeout);
+                animateTimeout = cancelAnimationFrame(animateTimeout);
             }
             paper.clear();
             mesh = null;
@@ -854,7 +859,7 @@
                     var polyMeta = depthPolyMeta[depth];
                     var polygons = polyMeta.polygons;
 
-                    polygons.forEach(function (node) {
+                    polygons.forEach(function redrawPolygon(node) {
                         if (!node.vertices) {
                             typeof console !== 'undefined' && console.log('not implemented yet');
                             return;
@@ -897,41 +902,11 @@
                     renderedStable = true;
                     for (depth = maxDepth; depth >= 1; --depth) {
                         polyMeta = depthPolyMeta[depth];
-                        polyMeta.polygons.forEach(function (node) {
+                        polyMeta.polygons.forEach(function drawLabel(node) {
                             var minFont = minFontOpt;
                             var maxFont = node.children ? maxFontOpt : maxLeafFont;
                             var centroidX = node.centroid[0];
                             var centroidY = node.centroid[1];
-                            var textEl = paper.text(centroidX, centroidY, node.name).attr({
-                                dy: '.35em', 'text-anchor': 'middle',
-                                fill: 'white',
-                                'font-family': 'Verdana',
-                                'font-weight': 'bold',
-                                'font-size': maxFont,
-                                opacity: depth <=2 ? baseOpacity : 1
-                            });
-
-                            if (options.onNodeTitleClick ) {
-                                textEl.hover(function () {
-                                    textEl.scale(1.05);
-                                }, function () {
-                                    textEl.scale(1 / 1.05);
-                                });
-                            }
-
-                            var names = [];
-                            for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
-
-                            textEl.click(function() {
-                                if (options.onNodeTitleClick) {
-                                    options.onNodeTitleClick (node, names);
-                                }
-                                else {
-                                    if (node.children) {
-                                        onLeftClick(node);
-                                    }
-                                }
-                            });
 
                             var poly = d3.geom.polygon(node.poly);
                             var horz = poly.clip([[0, centroidY], [width, centroidY]]);
@@ -958,23 +933,77 @@
                                 }
                             }
 
-                            var sized = false;
+                            var textCenterX = centroidX, text = node.name, fontSize = minFont, availX, availY;
+
                             if (horz.length) {
+                                // Get the available width/height by clipping a horizontal/vertical line through
+                                //   the centroid of the polygon.
                                 var vert = poly.clip([[centroidX, 0], [centroidX, height]]);
                                 if (vert.length) {
-                                    // todo: why is horz sometimes empty?
-                                    Raphael.svg && textEl.attr('x', 0.5 * (horz[0][0] + horz[1][0]));
-                                    var wrapAttrs = wordWrap(paper, 'Verdana', horz[0][0] - horz[1][0], node.name, 0.5, maxFont, minFont, vert[0][1] - vert[1][1], textEl);
-                                    sized = wrapAttrs.fit;
+                                    if (Raphael.svg) {
+                                        textCenterX =  0.5 * (horz[0][0] + horz[1][0]);
+                                    }
+
+                                    availX = horz[0][0] - horz[1][0];
+                                    availY = vert[0][1] - vert[1][1];
                                 }
                             }
 
+                            if (!availX || !availY) {
+                                // The clip trick won't work if the polygon is concave; just use the bounding box.
+                                var box = node.path.getBBox();
+                                if (!availX) {
+                                    availX = box.width
+                                }
+                                if (!availY) {
+                                    availY = box.height
+                                }
+                            }
+
+                            var maxWidth = Math.ceil(0.75 * availX);
+                            var maxHeight = Math.ceil(0.75 * availY);
+                            var wrapAttrs = wordWrap(paper, 'Verdana', maxWidth, maxHeight, node.name, maxFont, minFont);
+                            var sized = wrapAttrs.fit;
+
+                            if (sized) {
+                                text = wrapAttrs.text;
+                                fontSize = wrapAttrs.fontSize;
+                            }
+
                             if (sized || !enforceLabelBounds) {
+                                var textEl = paper.text(textCenterX, centroidY, text).attr({
+                                    dy: '.35em', 'text-anchor': 'middle',
+                                    fill: 'white',
+                                    'font-family': 'Verdana',
+                                    'font-weight': 'bold',
+                                    'font-size': fontSize,
+                                    opacity: depth <=2 ? baseOpacity : 1
+                                });
+
+                                if (options.onNodeTitleClick ) {
+                                    textEl.hover(function () {
+                                        textEl.scale(1.05);
+                                    }, function () {
+                                        textEl.scale(1 / 1.05);
+                                    });
+                                }
+
+                                var names = [];
+                                for (var current = node; current != null; current = current.parent) { names.push((current.data || current).name); }
+
+                                textEl.click(function() {
+                                    if (options.onNodeTitleClick) {
+                                        options.onNodeTitleClick (node, names);
+                                    }
+                                    else {
+                                        if (node.children) {
+                                            onLeftClick(node);
+                                        }
+                                    }
+                                });
+
                                 textEl.insertAfter(polyMeta.lastPath);
                                 node.textEl = textEl;
-                            }
-                            else {
-                                textEl.remove();
                             }
 
                             // Need to handle right-clicks with mouseup since .click() doesn't catch right-click events
@@ -1046,7 +1075,7 @@
                     if (!skipAnimation) {
                         // Animations have to be done as a separate step to make it smoother, since the CPU load from
                         // the text position computation means it takes a long time to finish.
-                        setTimeout(function(){
+                        requestAnimationFrame(function(){
                             for (depth = Math.min(2, maxDepth); depth >= 1; --depth) {
                                 var polygons = depthPolyMeta[depth].polygons;
                                 var baseDelay = Math.min(textFadeStartDelay, textFadeMaxDelay / polygons.length);
@@ -1063,7 +1092,7 @@
                                     }
                                 });
                             }
-                        }, 10);
+                        });
                     }
                 }
 
@@ -1221,7 +1250,7 @@
 
         function renderData(json, clusterSentiment) {
             if (animateTimeout) {
-                animateTimeout = clearTimeout(animateTimeout);
+                animateTimeout = cancelAnimationFrame(animateTimeout);
             }
 
             if (json) {
@@ -1281,20 +1310,32 @@
             animateLoop();
         }
 
-        function animateLoop() {
+        var lastDrawnTimestamp;
+
+        function animateLoop(timestamp) {
             var finished;
 
-            if (!isDragging) {
-                // Optionally take multiple steps before each redraw
-                for (var ii = 1; ii < animationStepIncrement; ++ii) {
-                    mesh.step();
+            if (isDragging) {
+                lastDrawnTimestamp = timestamp;
+            } else {
+                var steps = animationStepIncrement;
+
+                if (timestamp && lastDrawnTimestamp) {
+                    steps = (timestamp - lastDrawnTimestamp) / animationDelay * animationStepIncrement;
                 }
-                finished = mesh.step();
-                mesh.redraw();
+
+                if (steps >= 1) {
+                    for (var ii = 0; !finished && ii < steps; ++ii) {
+                        finished = mesh.step();
+                    }
+
+                    mesh.redraw();
+                    lastDrawnTimestamp = timestamp;
+                }
             }
 
             if (continuousAnimate && !finished) {
-                animateTimeout = setTimeout(animateLoop, animationDelay);
+                animateTimeout = requestAnimationFrame(animateLoop);
             }
         }
     }
