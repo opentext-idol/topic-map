@@ -928,26 +928,41 @@
                                 }
                             }
 
-                            var sized = false, textCenterX = centroidX, text = node.name, fontSize = minFont;
+                            var textCenterX = centroidX, text = node.name, fontSize = minFont, availX, availY;
 
                             if (horz.length) {
+                                // Get the available width/height by clipping a horizontal/vertical line through
+                                //   the centroid of the polygon.
                                 var vert = poly.clip([[centroidX, 0], [centroidX, height]]);
                                 if (vert.length) {
-                                    // todo: why is horz sometimes empty?
                                     if (Raphael.svg) {
                                         textCenterX =  0.5 * (horz[0][0] + horz[1][0]);
                                     }
 
-                                    var maxWidth = Math.ceil(0.75 * (horz[0][0] - horz[1][0]));
-                                    var maxHeight = Math.ceil(0.75 * (vert[0][1] - vert[1][1]));
-                                    var wrapAttrs = wordWrap(paper, 'Verdana', maxWidth, maxHeight, node.name, maxFont, minFont);
-                                    sized = wrapAttrs.fit;
-
-                                    if (sized) {
-                                        text = wrapAttrs.text;
-                                        fontSize = wrapAttrs.fontSize;
-                                    }
+                                    availX = horz[0][0] - horz[1][0];
+                                    availY = vert[0][1] - vert[1][1];
                                 }
+                            }
+
+                            if (!availX || !availY) {
+                                // The clip trick won't work if the polygon is concave; just use the bounding box.
+                                var box = node.path.getBBox();
+                                if (!availX) {
+                                    availX = box.width
+                                }
+                                if (!availY) {
+                                    availY = box.height
+                                }
+                            }
+
+                            var maxWidth = Math.ceil(0.75 * availX);
+                            var maxHeight = Math.ceil(0.75 * availY);
+                            var wrapAttrs = wordWrap(paper, 'Verdana', maxWidth, maxHeight, node.name, maxFont, minFont);
+                            var sized = wrapAttrs.fit;
+
+                            if (sized) {
+                                text = wrapAttrs.text;
+                                fontSize = wrapAttrs.fontSize;
                             }
 
                             if (sized || !enforceLabelBounds) {
