@@ -928,7 +928,7 @@
                                 }
                             }
 
-                            var sized = false, textCenterX = centroidX, text = node.name, fontSize = maxFont;
+                            var sized = false, textCenterX = centroidX, text = node.name, fontSize = minFont;
 
                             if (horz.length) {
                                 var vert = poly.clip([[centroidX, 0], [centroidX, height]]);
