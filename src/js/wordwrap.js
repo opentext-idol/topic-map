@@ -20,18 +20,18 @@
 }(function ($, Raphael, _) {
     function fastLineBreak(textInput, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize;
-        var lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
+        var linesFit = fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize);
         var biggestFitting = -1;
 
-        if (lines.fit) {
+        if (linesFit) {
             biggestFitting = fontSize;
         } else {
             bestSize = binaryChop(minFontSize, fontSize - 1, function (fontSize) {
-                lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
-                if (lines.fit && fontSize > biggestFitting) {
+                linesFit = fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize);
+                if (linesFit && fontSize > biggestFitting) {
                     biggestFitting = fontSize;
                 }
-                return lines.fit;
+                return linesFit;
             });
         }
 
@@ -44,14 +44,17 @@
 
             var text = '', yOffset, spans = textEl.children();
 
-            spans.each(function(idx, el) {
-                var newOffsetTop = el.offsetTop;
+            for (var idx = 0, max = spans.length; idx < max; ++idx) {
+                var el = spans[idx],
+                    newOffsetTop = el.offsetTop;
                 if (yOffset && newOffsetTop !== yOffset) {
-                    text += '\n'
+                    text += '\n' + textInput[idx];
                 }
-                text += textInput[idx] + ' ';
+                else {
+                    text += textInput[idx];
+                }
                 yOffset = newOffsetTop;
-            })
+            }
 
             return {
                 fit: fit,
@@ -65,17 +68,14 @@
         }
     }
 
-    function fastTryTextLayout(text, textEl, maxWidth, maxHeight, fontSize) {
+    function fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize) {
         textEl.css({
             'font-size': fontSize
         })
 
         var dom = textEl[0];
 
-        return {
-            fit: dom.clientHeight <= maxHeight && dom.scrollWidth <= maxWidth,
-            text: text
-        }
+        return dom.clientHeight <= maxHeight && dom.scrollWidth <= maxWidth;
     }
 
     // should return highest integer value which passes testFn, or lowest value otherwise
@@ -96,7 +96,25 @@
     var layoutEl, lastFont;
 
     return function(paper, font, maxWidth, maxHeight, text, fontSize, minFontSize) {
-        var terms = text.split(' ');
+        // A browser will line break either on whitespace or after the hyphen/en-dash/em-dash in a hyphenated word.
+        // We use character classes not word boundary \b to allow matching non-ASCII characters, e.g. 'cat-àt'.
+        var regex = /\s+|[^\-\s]+[\-\u2013\u2014](?=[^\-\s]+)/g, idx = 0, match, trimmed = $.trim(text);
+
+        // List of words
+        var terms = [];
+
+        while (match = regex.exec(trimmed)) {
+            if (idx < regex.lastIndex) {
+                var term = trimmed.slice(idx, regex.lastIndex);
+                terms.push(term)
+            }
+
+            idx = regex.lastIndex
+        }
+
+        if (idx < trimmed.length) {
+            terms.push(trimmed.slice(idx))
+        }
 
         if (!layoutEl) {
             // The layout element needs to be visibility: hidden not display: none so we can get clientHeight etc.
