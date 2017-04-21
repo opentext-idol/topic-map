@@ -92,8 +92,8 @@
 
     return function(paper, font, maxWidth, maxHeight, text, fontSize, minFontSize) {
         // A browser will line break either on whitespace or after the hyphen/en-dash/em-dash in a hyphenated word.
-        // Since we use \b word boundary checks, we don't have to worry about a leading or trailing hyphen.
-        var regex = /\s+|\b([\-\u2013\u2014])\b/g, idx = 0, match, trimmed = $.trim(text);
+        // We use character classes not word boundary \b to allow matching non-ASCII characters, e.g. 'cat-àt'.
+        var regex = /\s+|([^\-\s]+)([\-\u2013\u2014])(?=[^\-\s]+)/g, idx = 0, match, trimmed = $.trim(text);
 
         // List of words
         var terms = [];
@@ -106,7 +106,13 @@
             }
 
             // We insert the em/en/hyphen if appropriate, otherwise we'll replace all whitespace with single space.
-            separators.push(match[1] || ' ')
+            if (match[1]) {
+                terms.push(match[1])
+                separators.push(match[2])
+            }
+            else {
+                separators.push(' ')
+            }
 
             idx = regex.lastIndex
         }
