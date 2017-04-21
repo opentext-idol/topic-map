@@ -13,7 +13,7 @@
         autn.vis.util.wordWrap = factory(jQuery, Raphael, _);
     }
 }(function ($, Raphael, _) {
-    function fastLineBreak(textInput, separators, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
+    function fastLineBreak(textInput, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize;
         var linesFit = fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize);
         var biggestFitting = -1;
@@ -43,10 +43,10 @@
                 var el = spans[idx],
                     newOffsetTop = el.offsetTop;
                 if (yOffset && newOffsetTop !== yOffset) {
-                    text += separators[idx] + '\n' + textInput[idx];
+                    text += '\n' + textInput[idx];
                 }
                 else {
-                    text += separators[idx] + textInput[idx];
+                    text += textInput[idx];
                 }
                 yOffset = newOffsetTop;
             }
@@ -93,25 +93,15 @@
     return function(paper, font, maxWidth, maxHeight, text, fontSize, minFontSize) {
         // A browser will line break either on whitespace or after the hyphen/en-dash/em-dash in a hyphenated word.
         // We use character classes not word boundary \b to allow matching non-ASCII characters, e.g. 'cat-àt'.
-        var regex = /\s+|([^\-\s]+)([\-\u2013\u2014])(?=[^\-\s]+)/g, idx = 0, match, trimmed = $.trim(text);
+        var regex = /\s+|[^\-\s]+[\-\u2013\u2014](?=[^\-\s]+)/g, idx = 0, match, trimmed = $.trim(text);
 
         // List of words
         var terms = [];
-        // List of separator prefix before each word
-        var separators = [''];
 
         while (match = regex.exec(trimmed)) {
-            if (idx < match.index) {
-                terms.push(trimmed.slice(idx, match.index))
-            }
-
-            // We insert the em/en/hyphen if appropriate, otherwise we'll replace all whitespace with single space.
-            if (match[1]) {
-                terms.push(match[1])
-                separators.push(match[2])
-            }
-            else {
-                separators.push(' ')
+            if (idx < regex.lastIndex) {
+                var term = trimmed.slice(idx, regex.lastIndex);
+                terms.push(term)
             }
 
             idx = regex.lastIndex
@@ -135,7 +125,7 @@
             return '<span>' + _.escape(term) + ' </span>'
         }).join(''));
 
-        var lineAttrs = fastLineBreak(terms, separators, layoutEl, maxWidth, fontSize, minFontSize, maxHeight);
+        var lineAttrs = fastLineBreak(terms, layoutEl, maxWidth, fontSize, minFontSize, maxHeight);
 
         return {
             fit: lineAttrs.fit,
