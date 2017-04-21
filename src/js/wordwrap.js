@@ -118,7 +118,9 @@
 
         if (!layoutEl) {
             // The layout element needs to be visibility: hidden not display: none so we can get clientHeight etc.
-            layoutEl = $('<div>').css({ visibility: 'hidden', 'overflow-x': 'hidden', 'font-family': font, 'font-weight': 'bold'}).appendTo(document.body)
+            layoutEl = $('<div>').css({ visibility: 'hidden', 'overflow-x': 'hidden',
+                'position': 'absolute', left: 0, top: 0,
+                'font-family': font, 'font-weight': 'bold'}).appendTo(document.body)
         }
         else if (lastFont !== font) {
             layoutEl.css('font-family', font);
