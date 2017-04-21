@@ -13,20 +13,20 @@
         autn.vis.util.wordWrap = factory(jQuery, Raphael, _);
     }
 }(function ($, Raphael, _) {
-    function fastLineBreak(textInput, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
+    function fastLineBreak(textInput, separators, textEl, maxWidth, fontSize, minFontSize, maxHeight) {
         var bestSize = fontSize;
-        var lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
+        var linesFit = fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize);
         var biggestFitting = -1;
 
-        if (lines.fit) {
+        if (linesFit) {
             biggestFitting = fontSize;
         } else {
             bestSize = binaryChop(minFontSize, fontSize - 1, function (fontSize) {
-                lines = fastTryTextLayout(textInput, textEl, maxWidth, maxHeight, fontSize);
-                if (lines.fit && fontSize > biggestFitting) {
+                linesFit = fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize);
+                if (linesFit && fontSize > biggestFitting) {
                     biggestFitting = fontSize;
                 }
-                return lines.fit;
+                return linesFit;
             });
         }
 
@@ -39,14 +39,17 @@
 
             var text = '', yOffset, spans = textEl.children();
 
-            spans.each(function(idx, el) {
-                var newOffsetTop = el.offsetTop;
+            for (var idx = 0, max = spans.length; idx < max; ++idx) {
+                var el = spans[idx],
+                    newOffsetTop = el.offsetTop;
                 if (yOffset && newOffsetTop !== yOffset) {
-                    text += '\n'
+                    text += separators[idx] + '\n' + textInput[idx];
                 }
-                text += textInput[idx] + ' ';
+                else {
+                    text += separators[idx] + textInput[idx];
+                }
                 yOffset = newOffsetTop;
-            })
+            }
 
             return {
                 fit: fit,
@@ -60,17 +63,14 @@
         }
     }
 
-    function fastTryTextLayout(text, textEl, maxWidth, maxHeight, fontSize) {
+    function fastTryTextLayout(textEl, maxWidth, maxHeight, fontSize) {
         textEl.css({
             'font-size': fontSize
         })
 
         var dom = textEl[0];
 
-        return {
-            fit: dom.clientHeight <= maxHeight && dom.scrollWidth <= maxWidth,
-            text: text
-        }
+        return dom.clientHeight <= maxHeight && dom.scrollWidth <= maxWidth;
     }
 
     // should return highest integer value which passes testFn, or lowest value otherwise
@@ -91,7 +91,29 @@
     var layoutEl, lastFont;
 
     return function(paper, font, maxWidth, maxHeight, text, fontSize, minFontSize) {
-        var terms = text.split(' ');
+        // A browser will line break either on whitespace or after the hyphen/en-dash/em-dash in a hyphenated word.
+        // Since we use \b word boundary checks, we don't have to worry about a leading or trailing hyphen.
+        var regex = /\s+|\b([\-\u2013\u2014])\b/g, idx = 0, match, trimmed = $.trim(text);
+
+        // List of words
+        var terms = [];
+        // List of separator prefix before each word
+        var separators = [''];
+
+        while (match = regex.exec(trimmed)) {
+            if (idx < match.index) {
+                terms.push(trimmed.slice(idx, match.index))
+            }
+
+            // We insert the em/en/hyphen if appropriate, otherwise we'll replace all whitespace with single space.
+            separators.push(match[1] || ' ')
+
+            idx = regex.lastIndex
+        }
+
+        if (idx < trimmed.length) {
+            terms.push(trimmed.slice(idx))
+        }
 
         if (!layoutEl) {
             // The layout element needs to be visibility: hidden not display: none so we can get clientHeight etc.
@@ -107,7 +129,7 @@
             return '<span>' + _.escape(term) + ' </span>'
         }).join(''));
 
-        var lineAttrs = fastLineBreak(terms, layoutEl, maxWidth, fontSize, minFontSize, maxHeight);
+        var lineAttrs = fastLineBreak(terms, separators, layoutEl, maxWidth, fontSize, minFontSize, maxHeight);
 
         return {
             fit: lineAttrs.fit,
