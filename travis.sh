@@ -1,5 +1,6 @@
 #!/bin/bash
 
+bower install
 grunt test || exit 1
 
 if [[ $TRAVIS_BRANCH == 'master' ]]
