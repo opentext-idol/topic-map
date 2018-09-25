@@ -843,7 +843,9 @@
 
                 }
 
-                if (largestStep < threshold) {
+                // It's possible for truly tiny components to give NaN for the largest step dur to overlapping edges,
+                //   if this happens we just terminate iteration since it'll loop forever otherwise.
+                if (isNaN(largestStep) || (largestStep < threshold)) {
                     stable = true;
                 }
             };
