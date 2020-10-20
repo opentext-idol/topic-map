@@ -1,10 +1,10 @@
-# HP Autonomy Topic Map
+# Micro Focus IDOL Topic Map
 
-[![Build Status](https://travis-ci.org/hpe-idol/topic-map.svg?branch=master)](https://travis-ci.org/hpe-idol/topic-map)
+[![Build Status](https://travis-ci.org/microfocus-idol/topic-map.svg?branch=master)](https://travis-ci.org/microfocus-idol/topic-map)
 
 A JQuery plugin for displaying information in a topic map.
 
-Documentation can be found [here](http://hpe-idol.github.io/topic-map).
+Documentation can be found [here](http://microfocus-idol.github.io/topic-map).
 
 This repo uses git-flow. develop is the development branch. master is the last known good branch.
 
@@ -26,6 +26,7 @@ This repo uses git-flow. develop is the development branch. master is the last k
 Yes
 
 ## License
-Copyright 2016-17 Hewlett Packard Enterprise Development LP
+
+(c) Copyright 2016-2018 Micro Focus or one of its affiliates.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
