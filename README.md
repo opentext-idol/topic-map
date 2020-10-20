@@ -26,7 +26,7 @@ This repo uses git-flow. develop is the development branch. master is the last k
 Yes
 
 ## License
-Copyright 2016-2017 Hewlett Packard Enterprise Development LP
-Copyright 2017-2018 Micro Focus International plc.
+
+(c) Copyright 2016-2018 Micro Focus or one of its affiliates.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
