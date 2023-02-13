@@ -19,14 +19,11 @@ This repo uses git-flow. develop is the development branch. master is the last k
 * grunt browser-test : Start a web server for running the jasmine specs in the browser
 * grunt lint : Run the JSHint checks and print the ersults to the console
 
-## Known Issues
-* Topic Map depends on Raphael version 2.1.2 because of a bug in Raphael 2.1.3+ this will be fixed when the bug in Raphael is closed.
-
 ## Is it any good?
 Yes
 
 ## License
 
-(c) Copyright 2016-2018 Micro Focus or one of its affiliates.
+(c) Copyright 2016-2018, 2020, 2023 Micro Focus or one of its affiliates.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.

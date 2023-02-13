@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2016-2017 Micro Focus or one of its affiliates.
+ * (c) Copyright 2016-2017, 2018, 2023 Micro Focus or one of its affiliates.
  *
  * Licensed under the MIT License (the "License"); you may not use this file
  * except in compliance with the License.
@@ -25,7 +25,7 @@
         define(['./wordwrap', 'jquery', 'underscore', 'Raphael', 'd3'], factory);
     } else {
         // We're using plain javascript imports, create jQuery plugin using imports from the Autn namespace.
-        factory(autn.vis.util.wordWrap, jQuery, _);
+        factory(autn.vis.util.wordWrap, jQuery, _, Raphael);
     }
 }(function (wordWrap, $, _, Raphael) {
     /**
@@ -893,13 +893,6 @@
                                     'stroke-opacity': node.children ? 0.2 : 0.7
                                 });
 
-                            /*
-                             * There is a bug in the Raphael attr() method which means the call above will not set fill-opacity.
-                             * The <path> elements created by Raphael have a fill attribute which refers to a <lineargradient>
-                             * by URL. The attr method tries to parse this fill attribute incorrectly.
-                             * Relates to commit 48491c87c51b41b24778d6b51e674966542555a4 in the Raphael JS repo.
-                             * TODO: Remove this once Raphael is fixed
-                             */
                             $(node.path.node)
                                 .attr('fill-opacity', fillOpacity)
                                 .css('fill-opacity', fillOpacity);
