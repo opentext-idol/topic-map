@@ -1,8 +1,8 @@
 {
   "name": "hp-autonomy-topic-map",
   "authors": [
-    "Tung Jin Chew <tung-jin.chew@microfocus.com>",
-    "Will Byrne <will.byrne@hpe.com>"
+    "Tung Jin Chew",
+    "Will Byrne"
   ],
   "description": "Jquery plugin for generating a topic map visualisation",
   "moduleType": [
@@ -12,7 +12,7 @@
     "tree-map",
     "topic-map",
     "visualisations",
-    "micro focus"
+    "opentext"
   ],
   "license": "MIT",
   "ignore": [

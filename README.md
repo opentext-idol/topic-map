@@ -1,4 +1,4 @@
-# Micro Focus IDOL Topic Map
+# OpenText IDOL Topic Map
 
 [![Build Status](https://travis-ci.org/microfocus-idol/topic-map.svg?branch=master)](https://travis-ci.org/microfocus-idol/topic-map)
 
@@ -24,6 +24,6 @@ Yes
 
 ## License
 
-(c) Copyright 2016-2018, 2020, 2023 Micro Focus or one of its affiliates.
+(c) Copyright 2016-2018, 2020, 2023 OpenText or one of its affiliates.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
