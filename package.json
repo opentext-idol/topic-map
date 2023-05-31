@@ -1,6 +1,6 @@
 {
   "name": "hp-autonomy-topic-map",
-  "repository": "https://github.com/microfocus-idol/topic-map",
+  "repository": "https://github.com/opentext-idol/topic-map",
   "private": true,
   "license": "MIT",
   "devDependencies": {

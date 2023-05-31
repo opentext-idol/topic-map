@@ -1,10 +1,8 @@
 # OpenText IDOL Topic Map
 
-[![Build Status](https://travis-ci.org/microfocus-idol/topic-map.svg?branch=master)](https://travis-ci.org/microfocus-idol/topic-map)
-
 A JQuery plugin for displaying information in a topic map.
 
-Documentation can be found [here](http://microfocus-idol.github.io/topic-map).
+Documentation can be found [here](http://opentext-idol.github.io/topic-map).
 
 This repo uses git-flow. develop is the development branch. master is the last known good branch.
 
@@ -24,6 +22,6 @@ Yes
 
 ## License
 
-(c) Copyright 2016-2018, 2020, 2023 OpenText or one of its affiliates.
+Copyright 2016-2018, 2020, 2023 OpenText or one of its affiliates.
 
 Licensed under the MIT License (the "License"); you may not use this project except in compliance with the License.
