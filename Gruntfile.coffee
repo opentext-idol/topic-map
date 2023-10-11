@@ -72,43 +72,21 @@ module.exports = (grunt) ->
           afterEach: false
           jasmine: false
           autn: false
-    'gh-pages':
-      'default':
-        src: '**/*'
-        options:
-          base: 'doc'
-          message: 'Update documentation'
       travis:
         src: '**/*'
         options:
           base: 'doc'
           message: 'Update documentation'
           repo: 'git@github.com:' + process.env.TRAVIS_REPO_SLUG
-    watch:
-      doc:
-        files: [source, 'README.md']
-        tasks: ['doc']
-      buildTest:
-        files: [specs, source]
-        tasks: ['jasmine:test:build']
-      test:
-        files: [specs, source]
-        tasks: ['jasmine:test']
 
 
-  grunt.loadNpmTasks 'grunt-gh-pages'
   grunt.loadNpmTasks 'grunt-jsdoc'
   grunt.loadNpmTasks 'grunt-contrib-jshint'
   grunt.loadNpmTasks 'grunt-contrib-connect'
   grunt.loadNpmTasks 'grunt-contrib-clean'
-  grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-contrib-jasmine'
 
   grunt.registerTask 'doc', ['jsdoc']
-  grunt.registerTask 'push-doc', ['doc', 'gh-pages:default']
-  grunt.registerTask 'push-doc-travis', ['doc', 'gh-pages:travis']
   grunt.registerTask 'lint', ['jshint']
   grunt.registerTask 'test', ['jasmine:test']
-  grunt.registerTask 'watch-doc', ['watch:doc']
-  grunt.registerTask 'watch-test', ['jasmine:test', 'watch:test']
-  grunt.registerTask 'browser-test', ['jasmine:test:build', 'connect:server', 'watch:buildTest']
+  grunt.registerTask 'browser-test', ['jasmine:test:build', 'connect:server:keepalive']
